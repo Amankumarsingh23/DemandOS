@@ -42,6 +42,7 @@ Thumbs.db
 *.ckpt
 
 # Keep data directories, never commit their contents
+/data/.m5-*/
 /data/raw/*
 !/data/raw/.gitkeep
 /data/interim/*
