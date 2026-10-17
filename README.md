@@ -4,12 +4,13 @@ DemandOS is a learning-driven retail demand intelligence project. Its goal is to
 turn credible sales forecasts and uncertainty estimates into cost-aware inventory
 decisions.
 
-## Current milestone: Season 3 — SQL analytics warehouse
+## Current milestone: Season 4 — retail EDA and sales segmentation
 
 This repository contains validated M5 ingestion and a local DuckDB/dbt retail
-analytics warehouse. Forecasting models, inventory optimization, APIs, and
-dashboards will be added in later sessions. There are no model results or
-datasets in Git.
+analytics warehouse, with reproducible retail EDA, figures, and ABC/XYZ and
+store-item intermittency classifications. Forecasting models, inventory
+optimization, APIs, and dashboards will be added in later sessions. There are
+no model results or datasets in Git.
 
 The verified source dataset is M5: daily product/store sales, calendar
 information, and selling prices. Sales are observations, not necessarily true
@@ -53,6 +54,9 @@ Run the package smoke check and synthetic ingestion tests after installation:
 | `sql/examples/` | Runnable teaching queries, separate from transformations |
 | `src/demandos/warehouse/` | dbt runner and SQL quality/performance reporting |
 | `data/warehouse/` | Ignored local DuckDB database, spill files, and reports |
+| `src/demandos/eda/` | Configured descriptive analysis, segmentation, charts, and reports |
+| `sql/eda/` | Bounded store-item statistics and complete-week product reductions |
+| `data/eda/` | Ignored generated EDA tables, PNG figures, Markdown, and quality reports |
 
 Data contents, local environments, secrets, and generated build files are ignored
 by Git. Obtain datasets separately under their applicable terms; no download is
@@ -186,6 +190,55 @@ query took 0.20 seconds on this Windows machine (2 DuckDB threads, 2GB managed
 buffer budget). Timings depend on hardware and caches. EXPLAIN showed a Parquet
 scan with projected store/units columns and a date filter at the scan. See the
 quality report and [warehouse documentation](docs/warehouse.md) for details.
+
+## Season 4: reproduce EDA and segmentation
+
+Use the existing Season 3 warehouse; no CSV re-ingestion or fact duplication:
+
+```powershell
+.\.venv\Scripts\python -m pip install -c configs/analytics-constraints.txt -e ".[analytics,eda]"
+.\.venv\Scripts\python -m demandos.eda
+.\.venv\Scripts\python -m unittest discover -s tests -v
+```
+
+Configuration is in `configs/eda.toml`. To compute labels strictly through a
+training cutoff, for example:
+
+```powershell
+.\.venv\Scripts\python -m demandos.eda --end 2015-12-31
+```
+
+Every run writes under `data/eda/<start_YYYYMMDD>_<end_YYYYMMDD>/`:
+
+- `tables/`: reduced Parquet summaries, product segments, store-item regimes,
+  daily/weekly/monthly patterns, selected outlier flags, and additive STL examples.
+- `figures/`: nine actual-data PNG charts for a full-history run.
+- `business_report.md`: measured findings, interpretations, follow-up questions,
+  definitions, caveats, and figure links.
+- `quality_report.json`: source fingerprint, config, reconciliation, classifications,
+  package versions, runtime, and artifact sizes in rows.
+
+Default window: **2011-01-29 through 2016-04-24**. ABC and XYZ both classify products
+across stores. ABC uses complete known-price revenue and deterministic crossing-item
+80%/95% boundaries. XYZ uses **273 complete Saturday-Friday weeks**, excluding one
+partial week, and population weekly CV cutoffs 0.5/1.0. Store-item regimes use
+ADI 1.32 and positive-sales-size CV² 0.49, with unsupported histories kept separate.
+
+Verified ABC counts: **A 1,264; B 923; C 862**. Store-item counts: **smooth 980;
+intermittent 23,102; erratic 497; lumpy 5,911**. The top 610 products (approximately
+20%) contribute **59.48%** of eligible known-price revenue. CA_3 leads recorded
+volume at **11,188,180 units**; Saturday's pooled weekday index is **1.210**.
+All five summary grains reconcile to **58,327,370 observations**, **65,695,409 units**,
+and **187,676,570.02** historical selling-price-based revenue. These are descriptive
+sales patterns, not stockout, profitability, demand, or causal conclusions.
+
+The first full-data EDA run took **27.54s** locally; the final verified regeneration
+took **96.71s** under different local load. Tests include synthetic
+population-statistic edge cases, zero/missing histories, ABC ties and crossings,
+XYZ boundaries, one-to-one joins, reconciliation, prior-only averages, and a
+complete SQL analysis with a training cutoff. All **28 Python tests** and a fresh
+run of **36 dbt tests** passed. Generated figures/reports/data remain ignored.
+See [EDA definitions, outputs, and limitations](docs/eda.md) for details.
 
 See [architecture](docs/architecture.md) and the
 [foundation decision](docs/decisions/0001-project-foundation.md) for scope and

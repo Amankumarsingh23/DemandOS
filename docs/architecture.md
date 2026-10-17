@@ -1,12 +1,15 @@
 # DemandOS architecture
 
-## Implemented scope: Seasons 1–3
+## Implemented scope: Seasons 1–4
 
 The installable Python package includes validated M5 ingestion and a local
 DuckDB/dbt analytics warehouse. Season 2 streams CSV sales into long-form
 Parquet; Season 3 queries that output through views and builds reusable
-dimensions and aggregate marts. Forecasting, inventory optimization, serving,
-dashboards, and monitoring are future work.
+dimensions and aggregate marts. Season 4 reduces those relations into descriptive
+statistics, temporal summaries, product ABC/weekly XYZ labels, store-item sales
+occurrence regimes, actual-data figures, and a reproducible business report.
+Forecasting, inventory optimization, serving, dashboards, and monitoring are
+future work.
 
 ## Problem and observational unit
 
@@ -34,6 +37,10 @@ unfulfilled demand, or business costs must be distinguished from measured data.
 7. Persist store/day, category/day, product/day, and store-history marts.
 8. Run dbt contracts, source/fact/mart reconciliation, executable teaching SQL,
    and a local analytics-quality report with measured timings and an EXPLAIN plan.
+9. Read the verified warehouse without rebuilding it, reduce large facts in SQL,
+   and perform bounded Python EDA using `configs/eda.toml`.
+10. Export ignored `data/eda/<start>_<end>/` summaries, product-level ABC/XYZ,
+    store-item regimes, nine full-history figures, and evidence-backed reports.
 
 The staging and fact views avoid full-size persisted copies of the source.
 Dimensions and marts are tables refreshed by `dbt build`. No external database
@@ -44,6 +51,8 @@ not a strict ceiling on total process memory.
 
 See [warehouse operations and contracts](warehouse.md) for exact keys, metric
 definitions, commands, limitations, and SQL examples.
+See [EDA contracts](eda.md) for analysis windows, compatible classification grains,
+cutoffs, revenue/null semantics, observation denominators, and temporal safeguards.
 
 ## Evaluation principles
 
@@ -60,3 +69,9 @@ PyArrow support ingestion; optional `analytics` dependencies provide DuckDB,
 dbt-core, and the DuckDB adapter. The ingestion package is unchanged by Season 3.
 Standard-library `unittest` covers installation, ingestion, and a synthetic dbt
 warehouse build. dbt data tests separately validate the entire real dataset.
+The optional `eda` extra adds Matplotlib and statsmodels. Season 4 leaves ingestion
+and dbt transformation code unchanged, uses population statistics, and bounds
+exact store-item quantile computation to one store at a time. No full fact table
+or product/day matrix is loaded into Python. Temporal components and segmentation
+labels are descriptive for their selected window; they are not automatically
+valid inputs at an earlier forecast origin.

@@ -45,6 +45,8 @@ Thumbs.db
 /data/.m5-*/
 /data/warehouse/
 /data/.warehouse-*/
+/data/eda/
+/data/.eda-*/
 /dbt/target/
 /dbt/logs/
 /dbt/dbt_packages/
