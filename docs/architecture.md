@@ -1,6 +1,6 @@
 # DemandOS architecture
 
-## Implemented scope: Seasons 1–5
+## Implemented scope: Seasons 1–6
 
 The installable Python package includes validated M5 ingestion and a local
 DuckDB/dbt analytics warehouse. Season 2 streams CSV sales into long-form
@@ -10,8 +10,9 @@ statistics, temporal summaries, product ABC/weekly XYZ labels, store-item sales
 occurrence regimes, actual-data figures, and a reproducible business report.
 Season 5 adds small-cohort mathematical diagnostics and forecast-origin temporal
 contracts, with training-only segmentation and preprocessing demonstrations.
-Forecasting models, inventory optimization, serving, dashboards, and monitoring
-are future work.
+Season 6 adds twelve observed-sales point-forecast baselines and a bounded,
+fixed-origin holdout experiment. Rolling-origin evaluation, inventory
+optimization, serving, dashboards, and monitoring are future work.
 
 ## Problem and observational unit
 
@@ -47,7 +48,12 @@ unfulfilled demand, or business costs must be distinguished from measured data.
     labels only through train_end, and select an illustrative diagnostic cohort.
 12. Export guarded correlation/stationarity tests, aligned differences,
     descriptive STL, and audited origin-time demonstrations under ignored
-    `data/diagnostics/train_<cutoff>/`; do not fit forecasting models.
+    `data/diagnostics/train_<cutoff>/`.
+13. Reuse training-only cohort selection, clip each history at the fixed origin,
+    and fit point-forecast baselines on a common trailing training window.
+14. Attach actual targets only after forecasting; export explicit fit outcomes,
+    raw/nonnegative predictions, coverage, MAE/WAPE, common-sample comparisons,
+    and two figures under ignored `data/forecasts/origin_<cutoff>/`.
 
 The staging and fact views avoid full-size persisted copies of the source.
 Dimensions and marts are tables refreshed by `dbt build`. No external database
@@ -92,3 +98,17 @@ features and rejects future sales, future-fitted transforms, centered/descriptiv
 components and unverified price availability. It checks declared as-of metadata,
 not otherwise unavailable real-world reporting delays. See
 [time-series contracts and operations](timeseries.md).
+
+Season 6's `forecasting.models` accepts one ordered complete daily Series and
+returns an explicit success/skip/failure result. Maintained statsmodels fits
+provide smoothing and ARIMA estimation; small deterministic functions provide
+simple and intermittent baselines. The experiment reuses Season 5 extraction
+and training-only segmentation, with no ingestion, dbt-model, or EDA changes.
+Its full 28-day forecast is generated before holdout observations are attached.
+Raw predictions remain available alongside `max(0, raw)` scored predictions.
+Fit metadata includes warnings, initialization, parameters, iterations, training
+bounds, and runtime. Read-only source access and before/after SHA-256 comparisons
+protect raw/interim/processed inputs. Comparisons intersect successful forecast
+keys by model set and keep store-item, store, and category scales separate.
+No complete fact table is loaded into Python; only the selected series and
+reduced training labels are fetched. See [forecasting contracts](forecasting.md).

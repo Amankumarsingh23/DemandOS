@@ -1,0 +1,12 @@
+[forecasting]
+horizon = 28
+seasonal_period = 7
+lookback = 730
+moving_window = 28
+alpha = 0.1
+beta = 0.1
+maxiter = 100
+sarima_series = 4
+arima_order = [1, 0, 0]
+sarima_order = [1, 0, 0]
+sarima_seasonal_order = [0, 1, 1, 7]

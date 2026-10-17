@@ -4,14 +4,16 @@ DemandOS is a learning-driven retail demand intelligence project. Its goal is to
 turn credible sales forecasts and uncertainty estimates into cost-aware inventory
 decisions.
 
-## Current milestone: Season 5 — time-series diagnostics and temporal validity
+## Current milestone: Season 6 — statistical forecasting baselines
 
 This repository contains validated M5 ingestion and a local DuckDB/dbt retail
 analytics warehouse, with reproducible retail EDA, figures, and ABC/XYZ and
 store-item intermittency classifications, plus time-series diagnostics and
-origin-aware temporal utilities. Forecasting models, inventory
-optimization, APIs, and dashboards will be added in later sessions. There are
-no model results or datasets in Git.
+origin-aware temporal utilities. Twelve point-forecast baselines now run on a
+small training-selected cohort with explicit coverage and fixed-origin MAE/WAPE
+evaluation. Rolling-origin backtesting, inventory optimization, APIs, and
+dashboards remain future work. Generated datasets, forecasts, and reports stay
+outside Git; verified results are documented below.
 
 The verified source dataset is M5: daily product/store sales, calendar
 information, and selling prices. Sales are observations, not necessarily true
@@ -261,7 +263,8 @@ data only; future target observations do not influence scaling or segmentation.
 Implemented: grouped historical lags, origin-relative features for horizons
 1/7/14/28, prior/trailing rolling statistics, first/second/weekly differences,
 guarded ACF/PACF and ADF/KPSS, descriptive additive STL, chronological boundaries,
-and expanding/rolling origin examples. No forecasting models or benchmarks.
+and expanding/rolling origin examples. Forecasting is implemented separately in
+Season 6 below.
 
 The verified illustrative cohort contains **13 store-item series, CA_3, and three
 categories**. Of 68 original/transformed combinations, **64** have valid classical
@@ -278,6 +281,55 @@ runtime. **41 Python tests** and **36 dbt tests**
 passed, including deliberate leakage violations and future-perturbation tests.
 See [time-series definitions and contracts](docs/timeseries.md) for estimator
 choices, guardrails, feature availability assumptions, and exact output grains.
+
+## Season 6: statistical forecasting and one fixed holdout
+
+Reuse the installed analytics/EDA extras and verified warehouse:
+
+```powershell
+.\.venv\Scripts\python -m pip install -c configs/analytics-constraints.txt -e ".[analytics,eda]"
+.\.venv\Scripts\python -m demandos.forecasting --root . --config configs/forecasting.toml
+.\.venv\Scripts\python -m unittest discover -s tests -v
+.\.venv\Scripts\python -m demandos.warehouse check
+```
+
+Implemented: naive, seasonal naive, trailing moving average, SES, Holt linear,
+Holt damped, additive weekly Holt-Winters, ARIMA, SARIMA, original Croston, SBA,
+and TSB. All forecast observed sales, not uncensored demand. Raw predictions are
+retained; scoring uses `max(0, raw)` without altering actuals. A trailing moving
+average averages observations; ARIMA's MA(q) models past forecast-error shocks.
+
+The real experiment uses **13 store-item series, CA_3, and three categories**,
+selected with training-only regimes/ABC/XYZ. Origin: **2016-02-28**. All models
+use the same last **730 training days**, forecast the full **2016-02-29–2016-03-27**
+28-day vector, and expose h=1/7/14/28 errors. The later 28-day test block remains
+unused. SARIMA runs on four training-selected series; no holdout tuning or future
+prices are used. Defaults are explicit in `configs/forecasting.toml`.
+
+Verified outcomes: **184 successful, 16 skipped, four failed fits** from 204
+model/series combinations, producing **5,152 forecast rows**. Thirteen skips
+are the SARIMA cap; three have fewer than two positive events. Four additive
+Holt-Winters fits fail convergence and retain their four warnings. **52 negative
+raw horizon predictions** are retained and clipped for scoring. No silent fallback.
+
+On the **eight common store-item series** with successful fits for all 11
+non-SARIMA models, seasonal naive has **MAE 11.362, WAPE 37.991%**;
+Holt-Winters has **11.671, 39.027%**; naive has **15.290, 51.127%**.
+On all three common category aggregates, Holt-Winters has **MAE 1,024.056,
+WAPE 7.314%**, versus seasonal naive **1,283.679, 9.169%**. These comparison
+panels have different grains and are never pooled. A single selected holdout
+does not establish a robust model winner; RMSSE and rolling-origin evaluation
+remain Season 7 work.
+
+Outputs under ignored `data/forecasts/origin_20160228/`: `summary.json`,
+`forecast_report.md`, two forecast-vs-actual figures, and Parquet tables for raw
+and clipped forecasts, training/cohort labels, fit metadata/warnings, coverage,
+available/common-sample metrics, segments, horizons, and exact comparison members.
+The final verified regeneration took **8.73s** locally. **54 Python tests** and a fresh
+run of **36 real-data dbt tests** passed, including temporal invariance and
+raw/processed input immutability checks.
+See [forecasting contracts and measured results](docs/forecasting.md) for all model
+metrics, initialization, bounds, edge cases, and validation evidence.
 
 See [architecture](docs/architecture.md) and the
 [foundation decision](docs/decisions/0001-project-foundation.md) for scope and

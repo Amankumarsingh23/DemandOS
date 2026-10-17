@@ -49,6 +49,8 @@ Thumbs.db
 /data/.eda-*/
 /data/diagnostics/
 /data/.diagnostics-*/
+/data/forecasts/
+/data/.forecasts-*/
 /dbt/target/
 /dbt/logs/
 /dbt/dbt_packages/
