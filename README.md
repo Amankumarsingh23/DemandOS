@@ -4,11 +4,12 @@ DemandOS is a learning-driven retail demand intelligence project. Its goal is to
 turn credible sales forecasts and uncertainty estimates into cost-aware inventory
 decisions.
 
-## Current milestone: Season 4 — retail EDA and sales segmentation
+## Current milestone: Season 5 — time-series diagnostics and temporal validity
 
 This repository contains validated M5 ingestion and a local DuckDB/dbt retail
 analytics warehouse, with reproducible retail EDA, figures, and ABC/XYZ and
-store-item intermittency classifications. Forecasting models, inventory
+store-item intermittency classifications, plus time-series diagnostics and
+origin-aware temporal utilities. Forecasting models, inventory
 optimization, APIs, and dashboards will be added in later sessions. There are
 no model results or datasets in Git.
 
@@ -57,6 +58,8 @@ Run the package smoke check and synthetic ingestion tests after installation:
 | `src/demandos/eda/` | Configured descriptive analysis, segmentation, charts, and reports |
 | `sql/eda/` | Bounded store-item statistics and complete-week product reductions |
 | `data/eda/` | Ignored generated EDA tables, PNG figures, Markdown, and quality reports |
+| `src/demandos/timeseries/` | Guarded diagnostics, training-only cohort selection, and temporal contracts |
+| `data/diagnostics/` | Ignored generated diagnostic tables, figures, and reports |
 
 Data contents, local environments, secrets, and generated build files are ignored
 by Git. Obtain datasets separately under their applicable terms; no download is
@@ -239,6 +242,42 @@ XYZ boundaries, one-to-one joins, reconciliation, prior-only averages, and a
 complete SQL analysis with a training cutoff. All **28 Python tests** and a fresh
 run of **36 dbt tests** passed. Generated figures/reports/data remain ignored.
 See [EDA definitions, outputs, and limitations](docs/eda.md) for details.
+
+## Season 5: diagnostics and origin-time safety
+
+Use the same optional dependencies and existing warehouse:
+
+```powershell
+.\.venv\Scripts\python -m pip install -c configs/analytics-constraints.txt -e ".[analytics,eda]"
+.\.venv\Scripts\python -m demandos.timeseries
+.\.venv\Scripts\python -m unittest discover -s tests -v
+```
+
+Choices are in `configs/timeseries.toml`. Default chronological boundaries:
+training through **2016-02-28**, validation **2016-02-29–2016-03-27**, test
+**2016-03-28–2016-04-24**. Season 4 cohort labels are recomputed using training
+data only; future target observations do not influence scaling or segmentation.
+
+Implemented: grouped historical lags, origin-relative features for horizons
+1/7/14/28, prior/trailing rolling statistics, first/second/weekly differences,
+guarded ACF/PACF and ADF/KPSS, descriptive additive STL, chronological boundaries,
+and expanding/rolling origin examples. No forecasting models or benchmarks.
+
+The verified illustrative cohort contains **13 store-item series, CA_3, and three
+categories**. Of 68 original/transformed combinations, **64** have valid classical
+diagnostics and **four** are explicitly skipped for extreme sparsity. Original
+ADF/KPSS results include **13 conflicting pairs**, two compatible with
+nonstationarity, one compatible with stationarity, and one skip. These are
+exploratory selected-series results, not population stationarity verdicts.
+CA_3's training-series lag-7 ACF is **0.760**; HOUSEHOLD's is **0.881**.
+
+Outputs: `data/diagnostics/train_20160228/summary.json`, `diagnostic_report.md`,
+reusable Parquet tables, and 12 figures. The first full run took **34.27s** locally;
+the final verified regeneration took **33.35s**. Each report records its actual
+runtime. **41 Python tests** and **36 dbt tests**
+passed, including deliberate leakage violations and future-perturbation tests.
+See [time-series definitions and contracts](docs/timeseries.md) for estimator
+choices, guardrails, feature availability assumptions, and exact output grains.
 
 See [architecture](docs/architecture.md) and the
 [foundation decision](docs/decisions/0001-project-foundation.md) for scope and

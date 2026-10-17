@@ -1,6 +1,6 @@
 # DemandOS architecture
 
-## Implemented scope: Seasons 1–4
+## Implemented scope: Seasons 1–5
 
 The installable Python package includes validated M5 ingestion and a local
 DuckDB/dbt analytics warehouse. Season 2 streams CSV sales into long-form
@@ -8,8 +8,10 @@ Parquet; Season 3 queries that output through views and builds reusable
 dimensions and aggregate marts. Season 4 reduces those relations into descriptive
 statistics, temporal summaries, product ABC/weekly XYZ labels, store-item sales
 occurrence regimes, actual-data figures, and a reproducible business report.
-Forecasting, inventory optimization, serving, dashboards, and monitoring are
-future work.
+Season 5 adds small-cohort mathematical diagnostics and forecast-origin temporal
+contracts, with training-only segmentation and preprocessing demonstrations.
+Forecasting models, inventory optimization, serving, dashboards, and monitoring
+are future work.
 
 ## Problem and observational unit
 
@@ -41,6 +43,11 @@ unfulfilled demand, or business costs must be distinguished from measured data.
    and perform bounded Python EDA using `configs/eda.toml`.
 10. Export ignored `data/eda/<start>_<end>/` summaries, product-level ABC/XYZ,
     store-item regimes, nine full-history figures, and evidence-backed reports.
+11. Construct chronological train/validation/test boundaries, recompute Season 4
+    labels only through train_end, and select an illustrative diagnostic cohort.
+12. Export guarded correlation/stationarity tests, aligned differences,
+    descriptive STL, and audited origin-time demonstrations under ignored
+    `data/diagnostics/train_<cutoff>/`; do not fit forecasting models.
 
 The staging and fact views avoid full-size persisted copies of the source.
 Dimensions and marts are tables refreshed by `dbt build`. No external database
@@ -75,3 +82,13 @@ exact store-item quantile computation to one store at a time. No full fact table
 or product/day matrix is loaded into Python. Temporal components and segmentation
 labels are descriptive for their selected window; they are not automatically
 valid inputs at an earlier forecast origin.
+
+Season 5 reuses existing dependencies and the read-only warehouse connection.
+Broad SQL reductions compute only simple training-period segment statistics;
+expensive PACF/ADF/KPSS/STL calculations run on the small selected cohort. Actual
+post-origin sales are excluded before feature/scaler computation. The temporal
+contract distinguishes target-date historical shifts from origin-relative
+features and rejects future sales, future-fitted transforms, centered/descriptive
+components and unverified price availability. It checks declared as-of metadata,
+not otherwise unavailable real-world reporting delays. See
+[time-series contracts and operations](timeseries.md).

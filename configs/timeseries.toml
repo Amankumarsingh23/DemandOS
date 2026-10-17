@@ -1,0 +1,18 @@
+[timeseries]
+validation_days = 28
+test_days = 28
+max_store_items = 14
+store_aggregates = 1
+category_aggregates = 3
+max_lags = 56
+minimum_observations = 84
+minimum_nonzero = 20
+minimum_nonzero_fraction = 0.10
+rolling_days = 28
+seasonal_period = 7
+include_second_difference = true
+adf_maxlag = 14
+regression = "c"
+alpha = 0.05
+horizons = [1, 7, 14, 28]
+lags = [1, 7, 14, 28]
