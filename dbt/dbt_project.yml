@@ -1,0 +1,20 @@
+name: demandos
+version: '0.1.0'
+config-version: 2
+profile: demandos
+model-paths: [models]
+test-paths: [tests]
+macro-paths: [macros]
+clean-targets: [target, dbt_packages]
+vars:
+  expected_fact_rows: 58327370
+  expected_sales_days: 1913
+models:
+  demandos:
+    +materialized: view
+    core:
+      +materialized: table
+      fact_daily_sales:
+        +materialized: view
+    marts:
+      +materialized: table

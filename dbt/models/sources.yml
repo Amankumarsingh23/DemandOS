@@ -1,0 +1,17 @@
+version: 2
+sources:
+  - name: season2
+    description: Verified Season 2 daily sales Parquet; never uncensored demand.
+    meta:
+      external_location: >-
+        read_parquet('{{ env_var("DEMANDOS_PARQUET_PATH", "../data/processed/daily_sales.parquet") | replace("'", "''") }}')
+    tables:
+      - name: daily_sales
+        description: One row per store_id, item_id, date; missing prices retained.
+        columns:
+          - name: store_id
+            data_tests: [not_null]
+          - name: item_id
+            data_tests: [not_null]
+          - name: d
+            data_tests: [not_null]

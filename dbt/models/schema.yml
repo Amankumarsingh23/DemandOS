@@ -1,0 +1,82 @@
+version: 2
+models:
+  - name: stg_daily_sales
+    description: View over Season 2 Parquet. Grain store/item/date; date and price types standardized.
+  - name: dim_product
+    description: One row per item_id, with recorded department and category only.
+    columns:
+      - name: item_id
+        data_tests: [unique, not_null]
+      - name: dept_id
+        data_tests: [not_null]
+      - name: cat_id
+        data_tests: [not_null]
+  - name: dim_store
+    description: One row per store_id with state_id.
+    columns:
+      - name: store_id
+        data_tests: [unique, not_null]
+      - name: state_id
+        data_tests: [not_null]
+  - name: dim_calendar
+    description: One row per observed sales date; d also unique. Future dates not included.
+    columns:
+      - name: date
+        data_tests: [unique, not_null]
+      - name: d
+        data_tests: [unique, not_null]
+      - name: snap_CA
+        data_tests:
+          - accepted_values:
+              arguments: {values: [0, 1], quote: false}
+      - name: snap_TX
+        data_tests:
+          - accepted_values:
+              arguments: {values: [0, 1], quote: false}
+      - name: snap_WI
+        data_tests:
+          - accepted_values:
+              arguments: {values: [0, 1], quote: false}
+  - name: dim_price_week
+    description: Known weekly prices within observed history; key store/item/week. Missing prices have no dimension row.
+    data_tests:
+      - unique_key:
+          arguments: {columns: [store_id, item_id, wm_yr_wk]}
+    columns:
+      - name: sell_price
+        data_tests: [not_null]
+  - name: fact_daily_sales
+    description: View at store/item/date grain. Zero units imply zero revenue; positive units with missing price imply NULL revenue.
+    columns:
+      - name: store_id
+        data_tests:
+          - relationships:
+              arguments: {to: "ref('dim_store')", field: store_id}
+      - name: item_id
+        data_tests:
+          - relationships:
+              arguments: {to: "ref('dim_product')", field: item_id}
+      - name: date
+        data_tests:
+          - relationships:
+              arguments: {to: "ref('dim_calendar')", field: date}
+  - name: mart_store_daily
+    description: Store/date totals with price and revenue completeness; active items have positive sales.
+    data_tests:
+      - unique_key:
+          arguments: {columns: [store_id, date]}
+  - name: mart_category_daily
+    description: Category/date totals across stores. Active distinct items are not additive across marts.
+    data_tests:
+      - unique_key:
+          arguments: {columns: [cat_id, date]}
+  - name: mart_product_daily
+    description: Item/date totals across stores, including count of stores with positive sales.
+    data_tests:
+      - unique_key:
+          arguments: {columns: [item_id, date]}
+  - name: mart_store_performance
+    description: One row per store for full sales history. Active items counted distinctly over the entire history.
+    columns:
+      - name: store_id
+        data_tests: [unique, not_null]

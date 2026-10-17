@@ -4,11 +4,12 @@ DemandOS is a learning-driven retail demand intelligence project. Its goal is to
 turn credible sales forecasts and uncertainty estimates into cost-aware inventory
 decisions.
 
-## Current milestone: Season 2 — ingestion and validation
+## Current milestone: Season 3 — SQL analytics warehouse
 
-This repository contains the project foundation and a local M5 CSV ingestion
-pipeline. Forecasting models, inventory optimization, APIs, and dashboards will
-be added in later sessions. There are no model results or datasets in Git.
+This repository contains validated M5 ingestion and a local DuckDB/dbt retail
+analytics warehouse. Forecasting models, inventory optimization, APIs, and
+dashboards will be added in later sessions. There are no model results or
+datasets in Git.
 
 The verified source dataset is M5: daily product/store sales, calendar
 information, and selling prices. Sales are observations, not necessarily true
@@ -48,6 +49,10 @@ Run the package smoke check and synthetic ingestion tests after installation:
 | `src/demandos/` | Installable Python package |
 | `scripts/` | Repeatable project commands when needed |
 | `tests/` | Automated checks |
+| `dbt/` | Portable profile, staging/core/mart SQL, macros, and data tests |
+| `sql/examples/` | Runnable teaching queries, separate from transformations |
+| `src/demandos/warehouse/` | dbt runner and SQL quality/performance reporting |
+| `data/warehouse/` | Ignored local DuckDB database, spill files, and reports |
 
 Data contents, local environments, secrets, and generated build files are ignored
 by Git. Obtain datasets separately under their applicable terms; no download is
@@ -126,8 +131,61 @@ remain null and do not prove a stockout or lack of product availability.
 The complete reshape is `30,490 * 1,913 = 58,327,370` rows. Reproduce it using
 the installation and ingestion commands above; obtain the raw CSVs separately.
 The JSON report records source fingerprints so runs using different inputs can
-be distinguished. All 9 automated tests passed; those tests use synthetic data
-and are separate from this full-data verification.
+be distinguished. All 9 Season 2 automated tests passed; those tests use
+synthetic data and are separate from this full-data verification.
+
+## DuckDB and dbt warehouse
+
+After Season 2 ingestion, run from the repository root:
+
+```powershell
+.\.venv\Scripts\python -m pip install -c configs/analytics-constraints.txt -e ".[analytics]"
+.\.venv\Scripts\python -m demandos.warehouse build
+.\.venv\Scripts\python -m unittest discover -s tests -v
+.\.venv\Scripts\python -m demandos.warehouse examples
+```
+
+`build` executes dbt on the actual local Parquet, then verifies source/fact/mart
+totals, runs all six teaching SQL files, and writes the analytics-quality report.
+It does not rerun CSV ingestion. Staging and fact models are views; dimensions
+and four aggregate marts are persisted tables in `data/warehouse/demandos.duckdb`.
+
+Implemented dimensions: product, store, observed calendar, and known weekly
+prices. Marts summarize store/day, category/day, product/day, and store-wide
+historical performance. Counts of positive-sales items describe selling
+activity, not stock availability. Known revenue and complete revenue are separate
+metrics: positive sales with missing price imply unknown revenue; zero sales
+imply zero recorded revenue even when the price is unknown.
+
+`python -m demandos.warehouse check` rechecks summaries of a built warehouse.
+`python -m demandos.warehouse docs` generates local dbt documentation and lineage.
+See [warehouse operations, grains, and metric contracts](docs/warehouse.md) for
+direct dbt commands, portable paths, resource settings, and limitations.
+
+Local generated artifacts, all ignored by Git:
+
+- `data/warehouse/analytics_quality_report.json`: real metrics, reconciliations,
+  source fingerprint, dbt outcomes, measured node/query timings, and SQL results.
+- `data/warehouse/representative_explain.txt`: actual filtered-query plan.
+- `dbt/target/`: compiled SQL, lineage manifest, test/build results, generated docs.
+
+The optional analytics extra keeps ingestion dependencies separate. Warehouse
+integration tests use synthetic Parquet in a temporary directory, including
+positive sales with unknown prices and deliberately corrupted dimensions/marts.
+Install the extra to run those tests; otherwise they are explicitly skipped.
+
+Verified on the full M5 validation history: **10 models, 36/36 dbt tests, and
+14/14 Python tests passed**. Facts preserve 58,327,370 rows and 65,695,409 units.
+Historical selling-price-based revenue totals **187,676,570.02**; no positive-sales
+rows have unknown prices. Price completeness is 78.91% by observation count.
+Marts contain 19,130 store/day, 5,739 category/day, 5,832,737 product/day, and
+10 store-performance rows. All four reconcile to the source totals.
+
+The measured successful dbt build took 84.44 seconds; a filtered store-aggregation
+query took 0.20 seconds on this Windows machine (2 DuckDB threads, 2GB managed
+buffer budget). Timings depend on hardware and caches. EXPLAIN showed a Parquet
+scan with projected store/units columns and a date filter at the scan. See the
+quality report and [warehouse documentation](docs/warehouse.md) for details.
 
 See [architecture](docs/architecture.md) and the
 [foundation decision](docs/decisions/0001-project-foundation.md) for scope and

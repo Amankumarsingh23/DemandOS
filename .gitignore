@@ -43,6 +43,14 @@ Thumbs.db
 
 # Keep data directories, never commit their contents
 /data/.m5-*/
+/data/warehouse/
+/data/.warehouse-*/
+/dbt/target/
+/dbt/logs/
+/dbt/dbt_packages/
+/dbt/.user.yml
+*.duckdb
+*.duckdb.wal
 /data/raw/*
 !/data/raw/.gitkeep
 /data/interim/*

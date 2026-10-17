@@ -1,0 +1,16 @@
+# Portable, credential-free local profile. The Python runner resolves paths.
+demandos:
+  target: local
+  outputs:
+    local:
+      type: duckdb
+      path: "{{ env_var('DEMANDOS_WAREHOUSE_PATH', '../data/warehouse/demandos.duckdb') }}"
+      schema: main
+      threads: 1
+      # Set once at database connection: reapplying this after a spill is invalid.
+      config_options:
+        temp_directory: "{{ env_var('DEMANDOS_SPILL_PATH', '../data/warehouse/spill') }}"
+      settings:
+        threads: 2
+        memory_limit: "{{ env_var('DEMANDOS_MEMORY_LIMIT', '2GB') }}"
+        preserve_insertion_order: false
