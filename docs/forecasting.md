@@ -204,5 +204,12 @@ targets, and raw/processed fixture immutability. Existing training-label leakage
 tests remain in force. Real execution checks SHA-256 before/after for available
 raw CSVs and both input Parquet files, with unchanged results.
 
-Comprehensive rolling-origin evaluation, RMSSE, formal model selection,
+## Season 7 evaluation extension
+
+Rolling-origin execution, expanding/sliding sensitivity and train-only RMSSE
+are now implemented separately in [backtesting](backtesting.md), reusing this
+library without changing these Season 6 results. The January-first benchmark
+refits its selection labels at its earliest origin rather than borrowing
+February-fitted labels. The former final 28-day Season 6 block is now evaluated
+by Season 7, so it is no longer an untouched final test. Formal model selection,
 uncertainty/probabilistic forecasts and inventory decisions remain deferred.

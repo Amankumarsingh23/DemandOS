@@ -51,6 +51,8 @@ Thumbs.db
 /data/.diagnostics-*/
 /data/forecasts/
 /data/.forecasts-*/
+/data/backtests/
+/data/.backtests-*/
 /dbt/target/
 /dbt/logs/
 /dbt/dbt_packages/

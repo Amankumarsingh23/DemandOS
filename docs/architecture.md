@@ -1,6 +1,6 @@
 # DemandOS architecture
 
-## Implemented scope: Seasons 1–6
+## Implemented scope: Seasons 1–7
 
 The installable Python package includes validated M5 ingestion and a local
 DuckDB/dbt analytics warehouse. Season 2 streams CSV sales into long-form
@@ -11,8 +11,10 @@ occurrence regimes, actual-data figures, and a reproducible business report.
 Season 5 adds small-cohort mathematical diagnostics and forecast-origin temporal
 contracts, with training-only segmentation and preprocessing demonstrations.
 Season 6 adds twelve observed-sales point-forecast baselines and a bounded,
-fixed-origin holdout experiment. Rolling-origin evaluation, inventory
-optimization, serving, dashboards, and monitoring are future work.
+fixed-origin holdout experiment. Season 7 adds rolling-origin execution,
+expanding/sliding windows, explicit coverage, paired comparisons and train-only
+M5-style RMSSE scales. Inventory optimization, serving, dashboards, and monitoring
+are future work.
 
 ## Problem and observational unit
 
@@ -54,6 +56,12 @@ unfulfilled demand, or business costs must be distinguished from measured data.
 14. Attach actual targets only after forecasting; export explicit fit outcomes,
     raw/nonnegative predictions, coverage, MAE/WAPE, common-sample comparisons,
     and two figures under ignored `data/forecasts/origin_<cutoff>/`.
+15. Freeze an origin-safe cohort at the earliest backtest date, reuse the existing
+    forecasting interface at each origin/window, and retain every planned target
+    with explicit fit status under ignored `data/backtests/<design>/`.
+16. Derive nonseasonal training scales after initial-zero trimming, aggregate
+    micro/macro losses with visible denominators, and compare only shared
+    successful cases by origin, horizon, segment and aggregation grain.
 
 The staging and fact views avoid full-size persisted copies of the source.
 Dimensions and marts are tables refreshed by `dbt build`. No external database
@@ -112,3 +120,22 @@ protect raw/interim/processed inputs. Comparisons intersect successful forecast
 keys by model set and keep store-item, store, and category scales separate.
 No complete fact table is loaded into Python; only the selected series and
 reduced training labels are fetched. See [forecasting contracts](forecasting.md).
+
+Season 7's `backtesting` package composes the existing forecasting and temporal
+interfaces; no model or warehouse transformation is rewritten. `design` validates
+configurable origin/horizon/stride and training bounds. SQL reduces all-store
+training labels, while Python receives only the fixed small series cohort and
+aggregate histories. Target calendars are frozen and validated before fitting;
+fresh model states see only their allowed training prefix. Target vectors and
+training scales are cached within each execution, with no reuse of model state.
+`metrics` groups point losses and series-origin metrics, keeping undefined WAPE
+and RMSSE explicit. Successful intersections include window, series, origin,
+target and horizon, so overlapping windows cannot accidentally merge forecasts.
+Window sensitivity likewise matches successes across both windows.
+
+Small tested hierarchy and verified-as-of historical-revenue utilities are
+building blocks, not an official M5 competition scorer. Real benchmark weighting
+remains disabled because price availability has not been established. Manifest
+publication replaces generated files and removes only obsolete files previously
+tracked by that output manifest. Raw/interim/processed fingerprints are compared
+before and after execution. See [backtesting contracts](backtesting.md).

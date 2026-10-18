@@ -4,15 +4,16 @@ DemandOS is a learning-driven retail demand intelligence project. Its goal is to
 turn credible sales forecasts and uncertainty estimates into cost-aware inventory
 decisions.
 
-## Current milestone: Season 6 — statistical forecasting baselines
+## Current milestone: Season 7 — rolling-origin backtesting and M5 metrics
 
 This repository contains validated M5 ingestion and a local DuckDB/dbt retail
 analytics warehouse, with reproducible retail EDA, figures, and ABC/XYZ and
 store-item intermittency classifications, plus time-series diagnostics and
 origin-aware temporal utilities. Twelve point-forecast baselines now run on a
-small training-selected cohort with explicit coverage and fixed-origin MAE/WAPE
-evaluation. Rolling-origin backtesting, inventory optimization, APIs, and
-dashboards remain future work. Generated datasets, forecasts, and reports stay
+small training-selected cohort with explicit coverage, rolling-origin MAE/WAPE
+and train-only RMSSE evaluation, plus expanding/sliding window comparisons.
+Inventory optimization, APIs, and dashboards remain future work. Generated
+datasets, forecasts, and reports stay
 outside Git; verified results are documented below.
 
 The verified source dataset is M5: daily product/store sales, calendar
@@ -318,8 +319,8 @@ Holt-Winters has **11.671, 39.027%**; naive has **15.290, 51.127%**.
 On all three common category aggregates, Holt-Winters has **MAE 1,024.056,
 WAPE 7.314%**, versus seasonal naive **1,283.679, 9.169%**. These comparison
 panels have different grains and are never pooled. A single selected holdout
-does not establish a robust model winner; RMSSE and rolling-origin evaluation
-remain Season 7 work.
+does not establish a robust model winner. Season 7 below adds RMSSE and
+rolling-origin evaluation separately, preserving these Season 6 results.
 
 Outputs under ignored `data/forecasts/origin_20160228/`: `summary.json`,
 `forecast_report.md`, two forecast-vs-actual figures, and Parquet tables for raw
@@ -330,6 +331,57 @@ run of **36 real-data dbt tests** passed, including temporal invariance and
 raw/processed input immutability checks.
 See [forecasting contracts and measured results](docs/forecasting.md) for all model
 metrics, initialization, bounds, edge cases, and validation evidence.
+
+## Season 7: rolling-origin backtesting and metric comparisons
+
+Use the same installed dependencies, unchanged models, and verified warehouse:
+
+```powershell
+.\.venv\Scripts\python -m demandos.backtesting --root . --config configs/backtesting.toml
+.\.venv\Scripts\python -m unittest discover -s tests -v
+.\.venv\Scripts\python -c "from pathlib import Path; from demandos.warehouse.cli import settings,invoke_dbt; root,source,output,env=settings(Path.cwd()); invoke_dbt(root,env,'test')"
+```
+
+Default origins: **2016-01-31, 2016-02-28, 2016-03-27**, each with **28 target
+days**, covering February 1 through April 24 without overlap. All 12 existing
+methods run with expanding history and a **730-day sliding window**; ARIMA is
+capped at eight series and SARIMA at four. The cohort comprises **13 store-item
+series, CA_3 and three categories**, frozen using only training through January
+31. This reuses the Season 6 selection rules but changes one sparse example to
+avoid using February-fitted labels for January forecasts.
+
+Verified output: **1,224 model/series/origin/window cases**, **34,272 planned
+target rows**, **1,060 successful fits** (29,680 predictions), **142 skips** and
+**22 convergence failures/warnings**. Failed/skipped predictions remain null in
+the planned output; no fallback or origin removal occurs. Of 142 skips, 132 are
+explicit ARIMA/SARIMA caps and ten are all-zero histories unsupported by numerical
+fits. All inputs remain unchanged.
+
+Common simple-method results on **13 store-item series × three expanding-window
+origins**, 1,092 targets per method:
+
+| Model | MAE | Pooled WAPE | Macro RMSSE |
+| --- | ---: | ---: | ---: |
+| Naive | 18.780 | 65.080% | 0.931 |
+| Seasonal naive | 13.132 | 45.506% | 0.789 |
+| Moving average | 13.076 | 45.313% | 0.742 |
+
+Macro RMSSE averages **38 valid series-origin cases**; one all-zero training
+case is explicitly undefined. Seasonal naive has lower MAE at the first origin;
+moving average at the next two. Rankings also vary by horizon and segment.
+SARIMA's expanding-window WAPE **25.815%** versus seasonal naive **28.491%**
+uses a separate **two-series / six-case subset**, not the broader table.
+These are illustrative cohort results, **not official M5 WRMSSE**.
+The final verified benchmark took **31.75s** locally. **70 Python tests** and
+**36 fresh real-data dbt tests** passed; source fingerprints and forecast
+row/date/key/metric reconciliation checks passed.
+
+Ignored outputs: `data/backtests/20160131_20160327_h28_s28/`, containing a
+Markdown report, JSON summary, exact generated-file manifest, three figures,
+planned forecasts, coverage, scales, common-case rankings, origin/horizon/band
+metrics, paired losses, variability, ABC/XYZ/regime summaries and window
+sensitivity in Parquet. See [backtesting contracts and measured findings](docs/backtesting.md)
+for metric denominators, reproducibility, runtime and validation evidence.
 
 See [architecture](docs/architecture.md) and the
 [foundation decision](docs/decisions/0001-project-foundation.md) for scope and

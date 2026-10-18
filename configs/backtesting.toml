@@ -1,0 +1,23 @@
+[backtesting]
+first_origin = "2016-01-31"
+last_origin = "2016-03-27"
+horizon = 28
+stride = 28
+minimum_train_days = 84
+sliding_days = 730
+windows = ["expanding", "sliding"]
+max_store_items = 14
+store_aggregates = 1
+category_aggregates = 3
+arima_series = 8
+sarima_series = 4
+
+[model]
+seasonal_period = 7
+moving_window = 28
+alpha = 0.1
+beta = 0.1
+maxiter = 100
+arima_order = [1, 0, 0]
+sarima_order = [1, 0, 0]
+sarima_seasonal_order = [0, 1, 1, 7]
