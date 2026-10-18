@@ -240,3 +240,27 @@ wins consistently across origins, horizon bands and regimes. See
 [global forecasting contracts, complete measured results and commands](boosting.md)
 for category/missing-value policies, serialization, validation-only importance
 and ablation, safety evidence, outputs and limitations.
+
+## Season 10 architecture comparison
+
+`demandos.multihorizon` now composes the unchanged native LightGBM and metric
+interfaces into four architectures. Pooled forecasts use `f(X_t,h,C_(t+h))`;
+direct forecasts use separate `f_h(X_t,C_(t+h))`; recursive forecasts repeatedly
+apply a one-step model to simulated histories containing earlier predictions.
+The vector benchmark accepts one origin row and returns 28 predictions through
+28 independent LightGBM children trained on complete target vectors. It does
+not jointly learn a vector objective or output covariance.
+
+All historical labels require target dates on/before the fitting cutoff.
+Complete vectors additionally require all 28 observed targets. December
+chronological validation selects iterations and one pooled/seasonal-naive weight
+from 0/0.5/1 before January–March evaluation refits. Recursive lags and every
+rolling/level feature are recalculated from isolated floating-point simulated
+history; future actuals never enter feedback. Native missing/category policies,
+known-calendar assumptions and default price exclusion remain unchanged.
+
+All strategies and the unchanged simple baselines are compared on the same
+13-series, three-origin, 28-day grid with exact common cases, training-only
+scales, visible coverage and computational costs. This remains a previously
+examined retrospective benchmark, not an untouched test. See
+[architecture contracts, commands and measured results](multihorizon.md).

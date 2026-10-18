@@ -1,0 +1,5 @@
+[strategies]
+# Season 9 supplies the immutable cohort, feature definitions and fitting budget.
+boosting_config = "configs/boosting.toml"
+max_native_models = 232
+ensemble_weights = [0.0, 0.5, 1.0]

@@ -57,6 +57,8 @@ Thumbs.db
 /data/.features-*/
 /data/boosting/
 /data/.boosting-*/
+/data/strategies/
+/data/.strategies-*/
 /catboost_info/
 /dbt/target/
 /dbt/logs/

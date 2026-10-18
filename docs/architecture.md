@@ -1,6 +1,6 @@
 # DemandOS architecture
 
-## Implemented scope: Seasons 1–9
+## Implemented scope: Seasons 1–10
 
 The installable Python package includes validated M5 ingestion and a local
 DuckDB/dbt analytics warehouse. Season 2 streams CSV sales into long-form
@@ -17,7 +17,10 @@ M5-style RMSSE scales. Season 8 adds origin-level sales reductions, direct-horiz
 calendar expansion, training-only category state and physically separate labels.
 Season 9 fits three pooled, horizon-aware gradient-boosted models with bounded
 historical examples, chronological early stopping, origin-specific label
-eligibility and native serialization. Inventory optimization, serving,
+eligibility and native serialization. Season 10 compares pooled, recursive,
+direct horizon-specific and independently wrapped vector-output LightGBM, with
+an earlier-validation-selected ensemble and audited computational costs.
+Inventory optimization, serving,
 dashboards, and monitoring are future work.
 
 ## Problem and observational unit
@@ -81,6 +84,14 @@ unfulfilled demand, or business costs must be distinguished from measured data.
     evaluation origin, then join actuals and train-only scales on exact keys.
 22. Publish native models, same-case comparisons, eligibility/invariance audits,
     validation-only importance/ablation and reports under ignored `data/boosting/`.
+23. Reuse the same historical panel, feature contracts and chronological
+    development block to select pooled, one-step and per-horizon iterations.
+24. Fit a complete-target independent vector wrapper and select one convex
+    pooled/seasonal-naive weight using only pre-evaluation validation losses.
+25. Refit all four architectures at each benchmark origin; recursive forecasts
+    maintain isolated simulated histories and recompute all sales-history inputs.
+26. Publish native children, vector/ensemble state, same-case metrics, resource
+    comparisons and actual-versus-simulated traces under ignored `data/strategies/`.
 
 The staging and fact views avoid full-size persisted copies of the source.
 Dimensions and marts are tables refreshed by `dbt build`. No external database
@@ -199,3 +210,22 @@ expand only across the capped panel/origin/horizon grid. Comparisons reuse exact
 common-case metrics and full-prefix training-only scales. Known prior benchmark
 outcomes, limited sampling and default price exclusion restrict interpretation.
 See [global forecasting contracts](boosting.md).
+
+Season 10's `multihorizon` package adds architecture composition while leaving
+the Season 9 native estimator and source feature SQL unchanged. `vector` packs
+one origin-history row plus its 28 scheduled calendars and validates a separate
+complete observed target vector. `models` fits 28 independent children for direct
+and vector strategies; the latter changes sample eligibility and the API, not
+LightGBM's scalar objective. `recursive` rebuilds history features in floating
+point from observations through issuance plus prior predictions. Internal virtual
+origins advance, while canonical forecast origins remain fixed and traces keep
+actual-source dates distinct from simulated dates. No future actuals enter the
+recursive API. Price state remains frozen at issuance.
+
+`ensemble` validates exact component keys and selects a small convex weight grid
+on December validation only. `pipeline` freezes all choices before the three
+later refits, verifies all architectures after future perturbations and reloads,
+and composes unchanged Season 7 metrics. Canonical prediction aliases and status
+fields accompany the earlier evaluation schema. Publication reuses the guarded
+manifest workflow, and source fingerprints/warehouse totals remain hard gates.
+See [multi-horizon contracts and reproducibility](multihorizon.md).

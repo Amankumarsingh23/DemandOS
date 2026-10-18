@@ -4,7 +4,7 @@ DemandOS is a learning-driven retail demand intelligence project. Its goal is to
 turn credible sales forecasts and uncertainty estimates into cost-aware inventory
 decisions.
 
-## Current milestone: Season 9 — global gradient-boosted forecasts
+## Current milestone: Season 10 — multi-horizon forecasting strategies
 
 This repository contains validated M5 ingestion and a local DuckDB/dbt retail
 analytics warehouse, with reproducible retail EDA, figures, and ABC/XYZ and
@@ -15,7 +15,9 @@ and train-only RMSSE evaluation, plus expanding/sliding window comparisons.
 Direct-horizon features now combine origin-safe sales history, target calendars,
 verified-as-of historical-price interfaces and training-only categorical mappings.
 LightGBM, XGBoost and CatBoost now fit pooled, horizon-aware observed-sales models
-with chronological validation and origin-specific refits. Inventory optimization,
+with chronological validation and origin-specific refits. A separate experiment
+now compares pooled, recursive, direct horizon-specific and independent vector
+forecasting, plus an earlier-validation-selected ensemble. Inventory optimization,
 APIs, and dashboards remain future work. Generated
 datasets, forecasts, and reports stay
 outside Git; verified results are documented below.
@@ -510,8 +512,83 @@ Parquet files, native model files and metadata, forecasts, aligned metrics,
 coverage, eligibility audits, importance, validation ablation, two figures,
 `summary.json`, `experiment_report.md` and the generated-file manifest.
 See [global model contracts and reproducibility](docs/boosting.md) for API use,
-exact cutoffs, resource caps, artifact details and limitations. Horizon-specific
-models, alternative pooling and model-family ensembles remain Season 10 work.
+exact cutoffs, resource caps, artifact details and limitations. Season 10 extends
+this reference without changing the Season 9 experiment or its results.
+
+## Season 10: compare multi-horizon architectures
+
+Use the same tested installation and verified warehouse as Season 9:
+
+```powershell
+.\.venv\Scripts\python -m demandos.multihorizon --root . --config configs/multihorizon.toml
+.\.venv\Scripts\python -m unittest discover -s tests -v
+.\.venv\Scripts\python -c "from pathlib import Path; from demandos.warehouse.cli import settings,invoke_dbt; root,source,output,env=settings(Path.cwd()); invoke_dbt(root,env,'test')"
+```
+
+The pooled reference shares trees across horizons. Recursive LightGBM fits h=1,
+then feeds its own fractional nonnegative predictions into freshly recomputed
+lags, rolling statistics, zero/positive rates and level changes. Direct models
+fit one global LightGBM per horizon. The **independent multi-output wrapper**
+maps one origin row to a 28-value vector through 28 separate LightGBM children;
+it requires complete observed target vectors and has **no joint output loss**.
+One ensemble experiment selects pooled/seasonal-naive weights from 0/0.5/1 using
+the strictly earlier December validation block, then freezes them.
+
+All methods reuse the 96-series historical training panel and 13-series,
+three-origin benchmark. Each historical feature respects its own origin, each
+fitting label must already be observed by the fitting cutoff, and vector samples
+require all 28 labels. Models refit at each evaluation origin with frozen
+December-selected iterations. Native category/unknown handling, numerical
+missingness and default historical-price exclusion follow Season 9.
+
+Ignored `data/strategies/global_h28/` contains native model states, vector and
+ensemble contracts, canonical forecasts, exact common-case metrics, fit/coverage
+and computational-cost tables, recursive traces, leakage checks, five figures
+and a measured architecture report.
+
+Verified comparison on **1,092 identical targets per method**:
+
+| Strategy | MAE | Pooled WAPE | Macro RMSSE |
+| --- | ---: | ---: | ---: |
+| Pooled LightGBM | 12.898 | 44.695% | 0.725 |
+| Recursive LightGBM | 18.360 | 63.624% | 0.904 |
+| Direct, 28 models | 14.167 | 49.095% | 0.837 |
+| Independent multi-output, 28 children | 14.187 | 49.164% | 0.838 |
+| Validation-selected ensemble | 12.898 | 44.695% | 0.725 |
+| Seasonal naive | 13.132 | 45.506% | 0.789 |
+| Moving average | 13.076 | 45.313% | 0.742 |
+
+The ensemble selected **100% pooled / 0% seasonal naive**; it adds no accuracy
+gain. Pooled forecasts reproduce Season 9 exactly. All **232 native fits** and
+**156 local baseline fits** succeeded; **351 forecast cases / 9,828 rows** cover
+all nine methods including naive and TSB. RMSSE has 38 valid cases and one
+undefined scale. The **214** recorded native warning entries report no further
+positive-gain splits; there are no hidden fallbacks or nonfinite forecasts.
+
+Recursive MAE grows from **12.301** on days 1–7 to **21.404** on days 15–28.
+Direct models slightly beat pooled on days 8–14 (**12.768 vs 12.815**) but lose
+overall and on days 15–28 (**16.950 vs 14.549**). They improve the selected
+erratic example but lose on the selected smooth/intermittent cases. Vector and
+direct predictions match on days 15–28 because their eligible samples and
+selected iterations coincide there. This does not imply jointly learned outputs.
+
+Native model counts per origin are **1 pooled / 1 recursive / 28 direct /
+28 vector**. Across three evaluation refits, fitting took **22.78 / 1.18 /
+37.19 / 27.51s**, and strategy prediction took **0.32 / 33.08 / 9.57 / 14.26s**
+respectively. Total measured execution, including development, model validation,
+serialization and invariance checks, took **554.06s**. These are machine-specific
+observations, not intrinsic speed ratios. The known 13-series benchmark is not
+a pristine test, a full-panel estimate, or official M5 WRMSSE.
+
+All **105 Python tests** (including 12 new synthetic architecture tests) and
+**36 fresh real-data dbt tests** passed, with no skips. All 15 architecture/
+ensemble-origin future-perturbation checks pass; source fingerprints and
+warehouse totals remain unchanged. Serialized native models retain fit-only
+categories, cutoff/digest evidence and reload-equivalent predictions.
+
+See [multi-horizon contracts and commands](docs/multihorizon.md)
+for precise algorithmic distinctions, label eligibility, serialization and
+retrospective-benchmark limitations.
 
 See [architecture](docs/architecture.md) and the
 [foundation decision](docs/decisions/0001-project-foundation.md) for scope and

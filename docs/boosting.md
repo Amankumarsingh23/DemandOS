@@ -282,6 +282,15 @@ digests normalize date and integer storage representations; regression tests and
 real saved-artifact checks verify they survive Parquet reloads. A new experiment
 removes this stale verification record until checks are run again.
 
-Season 10 work remains deferred: horizon-specific models, alternative pooling
-strategies and model-family ensembles. No neural forecasting, quantiles,
-inventory simulation, serving or business-savings claim is included here.
+## Season 10 extension
+
+The separate [multi-horizon experiment](multihorizon.md) now compares this
+unchanged pooled LightGBM reference with true recursive one-step inference,
+28 horizon-specific global models, an explicitly independent 28-output wrapper,
+and a validation-selected pooled/seasonal-naive ensemble. It retains the same
+training panel, feature allowlist, chronological cutoffs and scoring contracts.
+The pooled reference is checked against these saved Season 9 predictions when
+available. Vector samples require the entire target vector observed by cutoff;
+recursive history uses predictions after issuance. These architecture experiments
+do not change the Season 9 results above. No neural forecasting, quantiles,
+inventory simulation, serving or business-savings claim is included.
