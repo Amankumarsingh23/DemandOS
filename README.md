@@ -4,7 +4,7 @@ DemandOS is a learning-driven retail demand intelligence project. Its goal is to
 turn credible sales forecasts and uncertainty estimates into cost-aware inventory
 decisions.
 
-## Current milestone: Season 7 — rolling-origin backtesting and M5 metrics
+## Current milestone: Season 8 — origin-safe time-series features
 
 This repository contains validated M5 ingestion and a local DuckDB/dbt retail
 analytics warehouse, with reproducible retail EDA, figures, and ABC/XYZ and
@@ -12,7 +12,9 @@ store-item intermittency classifications, plus time-series diagnostics and
 origin-aware temporal utilities. Twelve point-forecast baselines now run on a
 small training-selected cohort with explicit coverage, rolling-origin MAE/WAPE
 and train-only RMSSE evaluation, plus expanding/sliding window comparisons.
-Inventory optimization, APIs, and dashboards remain future work. Generated
+Direct-horizon features now combine origin-safe sales history, target calendars,
+verified-as-of historical-price interfaces and training-only categorical mappings.
+Gradient-boosted models, inventory optimization, APIs, and dashboards remain future work. Generated
 datasets, forecasts, and reports stay
 outside Git; verified results are documented below.
 
@@ -382,6 +384,55 @@ planned forecasts, coverage, scales, common-case rankings, origin/horizon/band
 metrics, paired losses, variability, ABC/XYZ/regime summaries and window
 sensitivity in Parquet. See [backtesting contracts and measured findings](docs/backtesting.md)
 for metric denominators, reproducibility, runtime and validation evidence.
+
+## Season 8: direct-horizon feature engineering
+
+Use the existing analytics/EDA installation and verified warehouse:
+
+```powershell
+.\.venv\Scripts\python -m demandos.features --root . --config configs/features.toml
+.\.venv\Scripts\python -m unittest discover -s tests -v
+```
+
+The canonical grain is **(store_id, item_id, origin_date, horizon)**, with
+`target_date = origin_date + horizon` for days **1–28**. Origin means end-of-day
+after that day's sales become available. `sales_at_origin` uses that day;
+`origin_lag_1` uses the preceding day. Rolling windows include the origin and
+require complete observed windows. Labels live in a separate Parquet file and
+are never predictive columns.
+
+Implemented: lags 1/7/14/28/56; 7/14/28-day mean, sum, population std, max,
+zero fraction and positive count; recent-level changes; target weekday/month,
+weekend, events, state-specific SNAP and cyclical encodings; raw identifiers and
+stable training-only category codes. Historical price/relative-price features
+require explicit observation/availability evidence. **Retrospective M5 prices
+remain unavailable by default**, with null values and true missingness flags.
+Target calendars are assumed scheduled and known at origin; announcement
+archives are not available to verify that assumption.
+
+Verified full-panel pass: **30,490 origin rows** at **2016-01-31**, reducing
+**1,737,930 bounded historical observations**, without full-panel horizon
+expansion. A diverse **13-series** cohort selected through **2015-10-10** produces
+**1,456 training feature rows and separate labels** from four earlier origins,
+plus **1,092 inference rows** at the three Season 7 origins. All 28 horizons are
+present. Mapping/selection is fitted before every generated origin; training
+labels end January 31, excluding the February–April evaluation targets.
+
+Whole feature tables match after future actuals are changed or removed at each
+evaluation origin. Default future-price exclusion is checked on real data;
+non-null historical price behavior and future-price perturbation are tested
+using explicit synthetic as-of evidence. Full-panel result DataFrame memory is
+about **15.5 MB**; the existing two-thread/2GB DuckDB buffer configuration is reused.
+No forecasting or ML model is trained by this pipeline.
+The final verified run took **76.47s** locally (**3.97s** for the full-panel
+origin reduction). **82 Python tests** and **36 fresh real-data dbt tests** passed.
+
+Outputs under ignored `data/features/direct_h28/`: training/inference feature
+Parquet, separate training labels, compact origin tables, per-origin partitions,
+saved category mappings, feature dictionaries, actual sample rows and a JSON/
+Markdown validation report. Add `--inference-only` to omit supervised tables,
+`--cohort <path>` for explicit store-item keys, or `--price-evidence <path>` for
+verified historical-price knowledge stamps. See [feature contracts and commands](docs/features.md).
 
 See [architecture](docs/architecture.md) and the
 [foundation decision](docs/decisions/0001-project-foundation.md) for scope and

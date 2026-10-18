@@ -244,3 +244,9 @@ and unchanged sources. Test fixtures are deterministic synthetic data and do
 not substitute for real M5 findings. Relevant real-data dbt tests are run
 separately. No new statistical/ML model, feature engineering, inventory policy
 or serving infrastructure is introduced.
+
+Season 8 adds [feature engineering](features.md) in a separate package, reusing
+these three evaluation origins without modifying the measured Season 7
+experiment. Its training feature/label origins are earlier, and its learned
+category/selection cutoff precedes all generated rows. No Season 7 evaluation
+targets fit feature mappings or cohort segmentation.

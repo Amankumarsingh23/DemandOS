@@ -1,6 +1,6 @@
 # DemandOS architecture
 
-## Implemented scope: Seasons 1–7
+## Implemented scope: Seasons 1–8
 
 The installable Python package includes validated M5 ingestion and a local
 DuckDB/dbt analytics warehouse. Season 2 streams CSV sales into long-form
@@ -13,7 +13,9 @@ contracts, with training-only segmentation and preprocessing demonstrations.
 Season 6 adds twelve observed-sales point-forecast baselines and a bounded,
 fixed-origin holdout experiment. Season 7 adds rolling-origin execution,
 expanding/sliding windows, explicit coverage, paired comparisons and train-only
-M5-style RMSSE scales. Inventory optimization, serving, dashboards, and monitoring
+M5-style RMSSE scales. Season 8 adds origin-level sales reductions, direct-horizon
+calendar expansion, training-only category state and physically separate labels.
+Gradient-boosted models, inventory optimization, serving, dashboards, and monitoring
 are future work.
 
 ## Problem and observational unit
@@ -62,6 +64,11 @@ unfulfilled demand, or business costs must be distinguished from measured data.
 16. Derive nonseasonal training scales after initial-zero trimming, aggregate
     micro/macro losses with visible denominators, and compare only shared
     successful cases by origin, horizon, segment and aggregation grain.
+17. Reduce selected historical windows in DuckDB to one store-item-origin row,
+    including a representative all-30,490-series pass at one origin.
+18. Expand only the selected cohort across horizons, validate target calendars
+    and categorical-fit cutoffs, then write inference/training features with
+    supervised labels in separate files under ignored `data/features/`.
 
 The staging and fact views avoid full-size persisted copies of the source.
 Dimensions and marts are tables refreshed by `dbt build`. No external database
@@ -139,3 +146,23 @@ remains disabled because price availability has not been established. Manifest
 publication replaces generated files and removes only obsolete files previously
 tracked by that output manifest. Raw/interim/processed fingerprints are compared
 before and after execution. See [backtesting contracts](backtesting.md).
+
+Season 8's `features` package uses the same warehouse views, Season 5 availability
+guards, Season 7 origin definitions and manifest publication. Bounded SQL
+aggregation validates daily history counts before calculating origin-relative
+lags and complete-window rolling statistics. The large fact relation is never
+cross-joined to horizons. A compact origin result is materialized once; only a
+bounded selected cohort is joined to target calendars and expanded in Python/
+DuckDB. Arrow schemas declare every output type, with a dictionary recording
+source, grain, role, availability and missingness policy for every column.
+
+Mapping/selection uses a cutoff before every training/evaluation origin.
+Categorical state is stable, serializable and target-free; unknown values map
+to zero. Predictive columns are allowlisted and exclude audit dates, segments
+and labels. The inference API never joins target actuals. Supervised labels need
+an explicit eligible cutoff and remain in a separate result/table. Historical
+price values require explicit observed/available dates plus a unique join to
+the weekly price dimension; default M5 prices remain null rather than inferred
+known. Public date/event/SNAP availability is a stated assumption, not verified
+announcement metadata. Full-vector future perturbation and prefix-only checks
+run against the real selected cohort. See [feature contracts](features.md).

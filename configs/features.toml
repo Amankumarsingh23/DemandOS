@@ -1,0 +1,8 @@
+[features]
+lags = [1, 7, 14, 28, 56]
+windows = [7, 14, 28]
+training_origins = ["2015-10-11", "2015-11-08", "2015-12-06", "2016-01-03"]
+mapping_fit_end = "2015-10-10"
+max_store_items = 14
+max_expanded_series = 256
+full_origin_pass = true

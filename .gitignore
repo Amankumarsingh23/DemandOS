@@ -53,6 +53,8 @@ Thumbs.db
 /data/.forecasts-*/
 /data/backtests/
 /data/.backtests-*/
+/data/features/
+/data/.features-*/
 /dbt/target/
 /dbt/logs/
 /dbt/dbt_packages/
