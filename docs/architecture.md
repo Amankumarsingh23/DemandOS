@@ -1,6 +1,6 @@
 # DemandOS architecture
 
-## Implemented scope: Seasons 1–10
+## Implemented scope: Seasons 1–11
 
 The installable Python package includes validated M5 ingestion and a local
 DuckDB/dbt analytics warehouse. Season 2 streams CSV sales into long-form
@@ -20,7 +20,9 @@ historical examples, chronological early stopping, origin-specific label
 eligibility and native serialization. Season 10 compares pooled, recursive,
 direct horizon-specific and independently wrapped vector-output LightGBM, with
 an earlier-validation-selected ensemble and audited computational costs.
-Inventory optimization, serving,
+Season 11 adds observed-sales intermittency diagnostics, global hurdle means,
+explicit cold-history simulations and supported priors, plus frozen regime
+routes/blends. Inventory optimization, serving,
 dashboards, and monitoring are future work.
 
 ## Problem and observational unit
@@ -92,6 +94,14 @@ unfulfilled demand, or business costs must be distinguished from measured data.
     maintain isolated simulated histories and recompute all sales-history inputs.
 26. Publish native children, vector/ensemble state, same-case metrics, resource
     comparisons and actual-versus-simulated traces under ignored `data/strategies/`.
+27. Compute observed-prefix ADI/CV² and cold-history statuses without borrowing
+    full-history segmentation or fabricating missing observations.
+28. Fit binary occurrence and positive-only squared-error size models, then
+    freeze December-selected regime routes and conservative convex blends.
+29. Reduce pre-origin category priors in SQL with leave-one-item-out exclusion,
+    and evaluate actual sales separately for continuity, sparse and cold cohorts.
+30. Publish support/probability/route evidence and invariance reports under
+    ignored `data/intermittent/`, preserving source fingerprints and warehouse sums.
 
 The staging and fact views avoid full-size persisted copies of the source.
 Dimensions and marts are tables refreshed by `dbt build`. No external database
@@ -229,3 +239,21 @@ and composes unchanged Season 7 metrics. Canonical prediction aliases and status
 fields accompany the earlier evaluation schema. Publication reuses the guarded
 manifest workflow, and source fingerprints/warehouse totals remain hard gates.
 See [multi-horizon contracts and reproducibility](multihorizon.md).
+
+Season 11's `intermittent` package composes the same feature, native model and
+metric contracts. It specializes the native binary objective for occurrence and
+reuses squared-error regression on positive-only labels for conditional means.
+Historical diagnostics and prior construction filter at issuance independently
+of model-fitting label eligibility. Cold simulation item IDs never enter global
+training; visible-history restrictions preserve actual values and explicit
+missingness. No-history cases retain unavailable ML status, with supported prior
+forecasts where possible. SQL prior summaries exclude the target item in every
+store, and unsupported priors never become arbitrary global means.
+
+The policy is a few fixed regime rules and blend candidates selected on earlier
+validation losses, with minimum sample thresholds and explicit defaults. Actuals
+are joined only for offline scoring, cold RMSSE scales use visible history only,
+and separate cohorts/common-key comparisons prevent misleading rankings. Real
+future perturbations regenerate features, diagnoses and priors before comparing
+loaded-model and frozen-policy outputs. No inventory/availability ground truth
+is introduced. See [sparse sales and cold-start contracts](intermittent.md).

@@ -264,3 +264,25 @@ All strategies and the unchanged simple baselines are compared on the same
 scales, visible coverage and computational costs. This remains a previously
 examined retrospective benchmark, not an untouched test. See
 [architecture contracts, commands and measured results](multihorizon.md).
+
+## Season 11 sparse-sales extension
+
+`demandos.intermittent` adds a global two-part observed-sales mean: binary
+positive-sales probability times a positive-only squared-error regression mean.
+This preserves origin/target/horizon keys and fitting cutoffs, with explicit
+degenerate-partition states and native save/load behavior. It does not estimate
+a full zero-truncated count distribution or recover uncensored demand.
+
+Origin-safe ADI/CV² diagnostics classify historical occurrence/positive-size
+patterns, with distinct no-observation, all-zero and insufficient-positive
+statuses. Cold simulations restrict histories for actual M5 items excluded from
+global training. Supported store-category/category priors exclude each target
+item in every store and use explicit shrinkage. Zero-history ML predictions
+remain unavailable rather than inventing history.
+
+Regime routes and small convex blends use only December validation evidence,
+minimum sample support and frozen defaults. Later origin labels never select
+their own rules. Comparisons retain cohort-specific exact shared keys, explicit
+skip support, occurrence calibration and conditional-positive error. No missing
+price or observed zero is treated as proof of a stockout. See
+[contracts, commands and measured Season 11 results](intermittent.md).

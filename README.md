@@ -4,7 +4,7 @@ DemandOS is a learning-driven retail demand intelligence project. Its goal is to
 turn credible sales forecasts and uncertainty estimates into cost-aware inventory
 decisions.
 
-## Current milestone: Season 10 — multi-horizon forecasting strategies
+## Current milestone: Season 11 — sparse sales and cold starts
 
 This repository contains validated M5 ingestion and a local DuckDB/dbt retail
 analytics warehouse, with reproducible retail EDA, figures, and ABC/XYZ and
@@ -17,7 +17,10 @@ verified-as-of historical-price interfaces and training-only categorical mapping
 LightGBM, XGBoost and CatBoost now fit pooled, horizon-aware observed-sales models
 with chronological validation and origin-specific refits. A separate experiment
 now compares pooled, recursive, direct horizon-specific and independent vector
-forecasting, plus an earlier-validation-selected ensemble. Inventory optimization,
+forecasting, plus an earlier-validation-selected ensemble.
+Origin-safe intermittency diagnostics, a global hurdle mean model, cold-history
+simulations, supported category priors and frozen segment policies are now
+implemented separately. Inventory optimization,
 APIs, and dashboards remain future work. Generated
 datasets, forecasts, and reports stay
 outside Git; verified results are documented below.
@@ -589,6 +592,60 @@ categories, cutoff/digest evidence and reload-equivalent predictions.
 See [multi-horizon contracts and commands](docs/multihorizon.md)
 for precise algorithmic distinctions, label eligibility, serialization and
 retrospective-benchmark limitations.
+
+## Season 11: sparse observed sales and cold starts
+
+Use the same tested installation and warehouse:
+
+```powershell
+.\.venv\Scripts\python -m demandos.intermittent --root . --config configs/intermittent.toml
+.\.venv\Scripts\python -m unittest discover -s tests -v
+.\.venv\Scripts\python -c "from pathlib import Path; from demandos.warehouse.cli import settings,invoke_dbt; root,source,output,env=settings(Path.cwd()); invoke_dbt(root,env,'test')"
+```
+
+Implemented diagnostics calculate origin-safe ADI and positive-size population
+CV², occurrence/zero summaries, days since a positive sale, and explicit
+all-zero/insufficient-history statuses. Global hurdle forecasts multiply a
+binary positive-sales probability by an untransformed positive-label regression
+mean. Priors use pre-origin store-category/category observations, exclude the
+target item in every store, and expose sample support and unavailable cases.
+
+A small regime router and conservative blend select rules on December
+validation, with minimum evidence thresholds and logged defaults. The real
+experiment separates **13 continuity series**, **24 sparse stress series** and
+**18 history/metadata-restricted cold simulations**. All cold item IDs are absent
+from global training; withheld history is never fabricated as observed zeros.
+No-history ML cases explicitly skip the established observed-history feature
+contract. Other baselines preserve their minimum-history requirements.
+
+M5 has **no verified stockout, inventory, introduction-date or lost-sales ground
+truth**. Zero sales, missing prices and intermittency do not establish stockouts.
+This implementation predicts recorded sales and does not recover exact true
+demand or claim inventory savings. The known January–March comparison is
+retrospective; cold histories are simulated restrictions on real observations.
+
+Outputs remain ignored under `data/intermittent/global_h28/`, with models,
+probability/size forecasts, origin diagnostics, prior support, policy evidence,
+coverage/metrics, timing/warnings, four figures and a measured report. See
+[Season 11 contracts and commands](docs/intermittent.md).
+
+On the same **1,092 continuity targets per method**, pooled/hurdle/router/ensemble
+WAPE is **44.695% / 46.372% / 46.159% / 44.910%**. Ensemble macro RMSSE is
+**0.715** versus pooled **0.725**, with 38 valid cases and one undefined scale;
+it does not improve pooled MAE/WAPE. On **1,960 shared sparse-stress targets**,
+TSB/hurdle/pooled WAPE is **56.745% / 60.033% / 64.814%**. Cold rankings use a
+separate **504-target supported intersection**; no-history priors and unavailable
+cases are reported separately rather than mixed into an unfair comparison.
+
+The hurdle occurrence Brier score is **0.163264** on continuity targets,
+**0.124317** on sparse targets and **0.215825** on supported cold targets;
+calibration remains imperfect. Across all ten methods, **46,200 planned rows**
+contain **38,976 successes / 7,224 explicit skips**. All 12 native fits and
+serialization checks passed. Source/warehouse integrity and real future
+perturbation checks passed; all **118 Python tests** passed without skips.
+All **36 fresh real-data dbt tests** passed.
+The final measured experiment took **246.12 seconds**. Detailed calibration,
+conditional-positive errors, support, timing and limitations are in the report.
 
 See [architecture](docs/architecture.md) and the
 [foundation decision](docs/decisions/0001-project-foundation.md) for scope and
