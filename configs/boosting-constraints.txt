@@ -1,0 +1,6 @@
+# Tested CPU versions on Python 3.13; XGBoost 3.4 requires Python >=3.12.
+# Install alongside analytics-constraints.txt; not a full lockfile.
+lightgbm==4.7.0
+xgboost==3.4.1
+catboost==1.2.10
+scikit-learn==1.9.1

@@ -4,7 +4,7 @@ DemandOS is a learning-driven retail demand intelligence project. Its goal is to
 turn credible sales forecasts and uncertainty estimates into cost-aware inventory
 decisions.
 
-## Current milestone: Season 8 — origin-safe time-series features
+## Current milestone: Season 9 — global gradient-boosted forecasts
 
 This repository contains validated M5 ingestion and a local DuckDB/dbt retail
 analytics warehouse, with reproducible retail EDA, figures, and ABC/XYZ and
@@ -14,7 +14,9 @@ small training-selected cohort with explicit coverage, rolling-origin MAE/WAPE
 and train-only RMSSE evaluation, plus expanding/sliding window comparisons.
 Direct-horizon features now combine origin-safe sales history, target calendars,
 verified-as-of historical-price interfaces and training-only categorical mappings.
-Gradient-boosted models, inventory optimization, APIs, and dashboards remain future work. Generated
+LightGBM, XGBoost and CatBoost now fit pooled, horizon-aware observed-sales models
+with chronological validation and origin-specific refits. Inventory optimization,
+APIs, and dashboards remain future work. Generated
 datasets, forecasts, and reports stay
 outside Git; verified results are documented below.
 
@@ -433,6 +435,83 @@ saved category mappings, feature dictionaries, actual sample rows and a JSON/
 Markdown validation report. Add `--inference-only` to omit supervised tables,
 `--cohort <path>` for explicit store-item keys, or `--price-evidence <path>` for
 verified historical-price knowledge stamps. See [feature contracts and commands](docs/features.md).
+
+## Season 9: global gradient-boosted forecasting
+
+Use the verified warehouse and a CPU Python environment. The exact tested
+boosting constraints require **Python 3.12+** (tested on **3.13.15**); the base
+ingestion package still supports Python 3.11+. Broader dependency ranges in the
+boosting extra are not a claim that every version combination was tested.
+
+```powershell
+.\.venv\Scripts\python -m pip install -c configs/analytics-constraints.txt -c configs/boosting-constraints.txt -e ".[analytics,eda,boosting]"
+.\.venv\Scripts\python -m pip check
+.\.venv\Scripts\python -m demandos.boosting --root . --config configs/boosting.toml
+.\.venv\Scripts\python -m unittest discover -s tests -v
+.\.venv\Scripts\python -c "from pathlib import Path; from demandos.warehouse.cli import settings,invoke_dbt; root,source,output,env=settings(Path.cwd()); invoke_dbt(root,env,'test')"
+```
+
+One global model per library learns across **96 early-prefix-selected series**,
+**58 historical origins**, and **154,560 eligible labeled examples**. It uses
+**57 predictors**, retaining native categories and horizon, excluding duplicate
+category codes, targets and audit fields. Numerical nulls remain missing;
+categories use fitting-fold vocabularies with an explicit unknown token.
+Retrospective M5 price predictors remain unavailable under Season 8 rules.
+
+Development fits use **133,056 labels observed by 2015-12-06**, with **2,688**
+validation targets on December 7–January 3. Early stopping selects **141/131/133**
+rounds for LightGBM/XGBoost/CatBoost. Those counts are frozen before evaluation.
+Refits at **2016-01-31, 2016-02-28 and 2016-03-27** use respectively **143,808,
+149,184 and 154,560** labels, each with `target_date <= origin`.
+
+Measured on identical **13 series × three origins × 28 days**, **1,092 targets
+per method**:
+
+| Model | MAE | Pooled WAPE | Macro RMSSE |
+| --- | ---: | ---: | ---: |
+| LightGBM | 12.898 | 44.695% | 0.725 |
+| XGBoost | 13.561 | 46.994% | 0.823 |
+| CatBoost | 14.516 | 50.301% | 0.748 |
+| Seasonal naive | 13.132 | 45.506% | 0.789 |
+| Moving average | 13.076 | 45.313% | 0.742 |
+| TSB | 13.015 | 45.102% | 0.729 |
+| Naive | 18.780 | 65.080% | 0.931 |
+
+Macro RMSSE uses **38 valid series-origin cases**, with one undefined zero-scale
+case. All **273 forecast cases** succeeded, producing **7,644 forecast rows**;
+all **169 global/local fitting attempts** succeeded. Five recorded LightGBM
+warning entries report no further positive-gain splits; no errors or fallbacks
+were hidden. Save/reload checks pass for all 13 saved global models, including
+development and the ablation. Real-data future perturbations pass for all nine
+library/origin combinations. Raw/interim/processed fingerprints and warehouse
+totals remain unchanged. **93 Python tests, 36 fresh real-data dbt tests and
+dependency consistency checks passed**. The final verified experiment took **126.80s**
+with two fitting threads; the historical pool DataFrame occupied **103.1 MB**,
+which is not a bound on total process memory.
+
+LightGBM improves pooled WAPE by **0.812 percentage points** against seasonal
+naive, but loses at the January origin, on the 15–28-day band and in some
+segments. Recent sales levels and item identity rank highly in tree importance;
+validation permutation checks also highlight recent sales history. Removing
+event features at the same 141 rounds improves internal-validation MAE from
+**3.901 to 3.866**; it does not change the primary evaluation specification.
+Importance is predictive, not causal.
+
+This is a small **known Season 7 benchmark**, not a pristine test, a full-panel
+accuracy estimate, official M5 WRMSSE, or evidence of inventory savings. Only
+**7 of the 13 evaluation series** occur in the independent training panel;
+unseen identities use the unknown-category policy. Global fitting uses a growing
+sample of labels from 2014 onward; statistical baselines use their full available
+history. Earlier outcomes may enter later refits once observed, without selecting
+parameters from their scores.
+
+Ignored outputs: `data/boosting/global_h28/`, containing separate feature/label
+Parquet files, native model files and metadata, forecasts, aligned metrics,
+coverage, eligibility audits, importance, validation ablation, two figures,
+`summary.json`, `experiment_report.md` and the generated-file manifest.
+See [global model contracts and reproducibility](docs/boosting.md) for API use,
+exact cutoffs, resource caps, artifact details and limitations. Horizon-specific
+models, alternative pooling and model-family ensembles remain Season 10 work.
 
 See [architecture](docs/architecture.md) and the
 [foundation decision](docs/decisions/0001-project-foundation.md) for scope and

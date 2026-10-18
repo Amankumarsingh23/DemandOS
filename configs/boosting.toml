@@ -1,0 +1,24 @@
+[boosting]
+training_start = "2014-01-05"
+training_stride = 14
+selection_cutoff = "2014-01-04"
+validation_origin = "2015-12-06"
+training_series = 96
+max_rows = 200000
+max_origins = 64
+iterations = 160
+patience = 15
+threads = 2
+seed = 42
+learning_rate = 0.05
+max_depth = 6
+num_leaves = 31
+min_child_samples = 20
+min_child_weight = 5.0
+reg_alpha = 0.0
+reg_lambda = 1.0
+subsample = 0.9
+colsample = 0.9
+cat_l2 = 3.0
+permutation_rows = 1024
+permutation_features = 5

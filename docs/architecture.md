@@ -1,6 +1,6 @@
 # DemandOS architecture
 
-## Implemented scope: Seasons 1–8
+## Implemented scope: Seasons 1–9
 
 The installable Python package includes validated M5 ingestion and a local
 DuckDB/dbt analytics warehouse. Season 2 streams CSV sales into long-form
@@ -15,8 +15,10 @@ fixed-origin holdout experiment. Season 7 adds rolling-origin execution,
 expanding/sliding windows, explicit coverage, paired comparisons and train-only
 M5-style RMSSE scales. Season 8 adds origin-level sales reductions, direct-horizon
 calendar expansion, training-only category state and physically separate labels.
-Gradient-boosted models, inventory optimization, serving, dashboards, and monitoring
-are future work.
+Season 9 fits three pooled, horizon-aware gradient-boosted models with bounded
+historical examples, chronological early stopping, origin-specific label
+eligibility and native serialization. Inventory optimization, serving,
+dashboards, and monitoring are future work.
 
 ## Problem and observational unit
 
@@ -69,6 +71,16 @@ unfulfilled demand, or business costs must be distinguished from measured data.
 18. Expand only the selected cohort across horizons, validate target calendars
     and categorical-fit cutoffs, then write inference/training features with
     supervised labels in separate files under ignored `data/features/`.
+19. Select a larger historical panel from an early prefix and reuse feature
+    generation across a bounded historical-origin schedule, caching only the
+    selected daily series in a temporary DuckDB table.
+20. Filter every supervised target by its allowed fitting cutoff; fit global
+    LightGBM/XGBoost/CatBoost models and fitting-fold categorical state, using
+    a strictly later chronological validation block for early stopping.
+21. Freeze iteration counts, refit each model using only labels observed by each
+    evaluation origin, then join actuals and train-only scales on exact keys.
+22. Publish native models, same-case comparisons, eligibility/invariance audits,
+    validation-only importance/ablation and reports under ignored `data/boosting/`.
 
 The staging and fact views avoid full-size persisted copies of the source.
 Dimensions and marts are tables refreshed by `dbt build`. No external database
@@ -166,3 +178,24 @@ the weekly price dimension; default M5 prices remain null rather than inferred
 known. Public date/event/SNAP availability is a stated assumption, not verified
 announcement metadata. Full-vector future perturbation and prefix-only checks
 run against the real selected cohort. See [feature contracts](features.md).
+
+Season 9's `boosting` package composes these feature and evaluation interfaces
+without changing earlier pipelines. Historical examples retain their own source
+dates; `target_date <= fitting_cutoff` is independently enforced when selecting
+labels. Development validation is chronological by target availability, followed
+by three later refits with frozen iteration counts. A previously fitted model
+may predict later origins, but cannot predict an origin earlier than its fitting
+cutoff. The benchmark deliberately refits at each origin so newly observed labels
+can enter the expanding historical sample.
+
+Model matrices use an explicit feature allowlist and native categories, omitting
+duplicate category codes and all labels/audit fields. The saved vocabulary is
+learned only from eligible fitting rows, independently of Season 8's earlier
+target-free feature mappings. Native model files and JSON metadata preserve
+predictor order, categories, cutoffs, parameters and warnings. Raw forecasts and
+nonnegative scored forecasts remain distinct. No full-panel daily matrix is
+loaded into Python: selected-series history is cached and aggregate features
+expand only across the capped panel/origin/horizon grid. Comparisons reuse exact
+common-case metrics and full-prefix training-only scales. Known prior benchmark
+outcomes, limited sampling and default price exclusion restrict interpretation.
+See [global forecasting contracts](boosting.md).

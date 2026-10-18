@@ -55,6 +55,9 @@ Thumbs.db
 /data/.backtests-*/
 /data/features/
 /data/.features-*/
+/data/boosting/
+/data/.boosting-*/
+/catboost_info/
 /dbt/target/
 /dbt/logs/
 /dbt/dbt_packages/

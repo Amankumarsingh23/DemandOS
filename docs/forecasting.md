@@ -213,3 +213,30 @@ refits its selection labels at its earliest origin rather than borrowing
 February-fitted labels. The former final 28-day Season 6 block is now evaluated
 by Season 7, so it is no longer an untouched final test. Formal model selection,
 uncertainty/probabilistic forecasts and inventory decisions remain deferred.
+
+## Season 9 global model extension
+
+The separate `demandos.boosting` package now implements CPU LightGBM, XGBoost
+and CatBoost through consistent fit/predict/save/load interfaces. Each model
+pools store-item series and direct horizons; the Season 6 statistical interface
+continues to fit one history at a time. Earlier experiment results above remain
+specific to their original cohort and origin.
+
+The new benchmark compares seven methods on the exact Season 7 store-item grid:
+13 series, three origins, 28 days. Models see only historical feature values
+available at each example's origin and labels observed by the fitting cutoff.
+December 2015 chronological validation selects iteration counts before January–
+March refits. Later evaluation targets never drive early stopping or feature
+selection. Reusing known Season 7 outcomes makes this an established benchmark,
+not a pristine final holdout. Global fitting uses a larger independent panel and
+a growing 2014-onward label sample; the local baselines retain full-prefix
+histories. Only forecast keys, actuals and scoring scales are identical.
+
+All seven methods cover 1,092 common targets each. LightGBM achieves measured
+MAE/WAPE/macro RMSSE **12.898 / 44.695% / 0.725**, seasonal naive
+**13.132 / 45.506% / 0.789**, moving average **13.076 / 45.313% / 0.742**.
+RMSSE averages 38 valid series-origin cases, with one undefined case. No method
+wins consistently across origins, horizon bands and regimes. See
+[global forecasting contracts, complete measured results and commands](boosting.md)
+for category/missing-value policies, serialization, validation-only importance
+and ablation, safety evidence, outputs and limitations.
