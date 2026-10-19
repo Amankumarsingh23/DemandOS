@@ -318,3 +318,13 @@ NNLS produce bottom estimates, followed by sparse aggregation for exact
 coherence. Real future-sales/price perturbation and source/warehouse hash checks
 gate manifest publication. No earlier pipeline, permanent warehouse relation
 or model implementation changes. See [reconciliation contracts](reconciliation.md).
+
+Season 16's `quantiles` package preserves existing model interfaces and adds
+native alpha-specific LightGBM objectives plus a generic N-BEATS-based residual
+network with a monotone multi-quantile head. Shared contracts validate wide keys,
+fitting cutoffs and ordered published thresholds. Shared losses retain raw and
+repaired diagnostic views, while exact common-case tables distinguish continuity
+from prefix-sparse stress. Frozen January weights, origin-only history/scales
+and nine real mutation/deletion/price gates enforce temporal isolation. Source
+hashes and warehouse totals gate ignored manifest publication. See [quantile
+contracts and limitations](quantiles.md).

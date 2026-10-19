@@ -851,6 +851,48 @@ ignored under `data/reconciliation/m5_cohort_h28/`. See
 for historical fitting cutoffs, covariance fallbacks and limitations. Results
 are cohort metrics, not official M5 WRMSSE.
 
+## Season 16: observed-sales probabilistic forecasts
+
+```powershell
+.\.venv\Scripts\python -m demandos.quantiles --root . --config configs/quantiles.toml
+```
+
+Three genuine LightGBM quantile objectives (P10/P50/P90), a **42,384-parameter
+N-BEATS-based joint monotone quantile network**, and a trailing empirical
+baseline share exact 28-day target keys. December validation selects **68/47/160
+tree rounds** and **eight neural epochs**; learned fitting labels then freeze
+at **2016-01-31** for all three origins. No evaluation targets tune models or
+calibration corrections. Later observed sales update inference histories only.
+
+On the separate **1,092-case original continuity** view:
+
+| Model | Mean pinball | 80% interval coverage | Mean width | Interval score |
+|---|---:|---:|---:|---:|
+| Quantile LightGBM | 5.238256 | 72.99% | 36.1432 | 71.0812 |
+| Joint neural quantiles | 4.344992 | 60.99% | 40.1436 | 68.0127 |
+| Historical empirical | 5.031685 | 78.94% | 36.1795 | 72.2143 |
+
+The separately reported **12-series prefix-sparse stress** view has 1,008 cases
+per method. Its empirical baseline has the lowest mean pinball. The neural
+softplus lower bound excludes exact observed zeros, causing only **37.60%**
+stress interval coverage despite ordered finite outputs; this limitation is
+explicitly tested and retained. Better pinball does not establish calibrated
+intervals. Quantiles concern observed sales, not uncensored true demand.
+
+Raw LightGBM forecasts have 28 crossings; deterministic nonnegative sorting
+repairs them without using actual targets. Raw/repaired metrics, inclusive
+coverage/tie counts, interval widths/scores and per-origin/horizon/regime results
+remain visible. Full coverage totals **6,300 forecasts**. All **216 Python tests**,
+**36 fresh dbt tests** and **nine real future-sales/price invariance gates** pass;
+source fingerprints and the **58,327,370-row** warehouse remain unchanged.
+
+The real run trained eight development/final models in **177.80 s**, with
+**1,275.0 MiB** peak process working set and zero training warnings/skips.
+Artifacts remain ignored under `data/quantiles/global_h28/`. The existing
+environment/dependencies suffice. See [quantile methods, actual results and
+reproduction](docs/quantiles.md), including why marginal quantiles cannot be
+summed through Season 15's hierarchy. No conformal or inventory work is included.
+
 See [architecture](docs/architecture.md) and the
 [foundation decision](docs/decisions/0001-project-foundation.md) for scope and
 design rationale.

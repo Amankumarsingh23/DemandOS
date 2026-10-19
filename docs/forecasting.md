@@ -336,3 +336,19 @@ common-case level/origin/horizon metrics and a separate 13-bottom continuity vie
 preserve interpretation. Six real perturbation gates verify that future sales
 and prices cannot change origin-issued forecasts. See [methods, exact provenance,
 real results and limitations](reconciliation.md).
+
+## Season 16 observed-sales uncertainty
+
+`demandos.quantiles` reuses the native origin-safe tabular contracts for three
+LightGBM quantile objectives and history-only N-BEATS residual blocks for a
+joint [B,28,3] monotone extension. December pinball validation selects iteration
+and epoch budgets; fitting labels/weights freeze at January 31 for all three
+evaluation origins. An unconditional trailing inverse-CDF baseline includes
+observed zeros. Raw and sorted/nonnegative exports share exact forecast keys,
+with pinball, inclusive cumulative coverage, interval scoring, ties and raw
+crossings reported separately. The softplus neural head cannot parameterize
+exact zero ties and substantially undercovers sparse observed-zero intervals;
+this is retained as an actual measured limitation. Prefix-sparse stress and
+original continuity cohorts remain separate. Season 15 maps support a bounded
+non-additivity diagnostic, not probabilistic reconciliation. See [quantile
+contracts, measured calibration and reproduction](quantiles.md).
