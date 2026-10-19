@@ -814,6 +814,43 @@ All **167 Python tests** passed without skips, including 17 TFT tests. All
 saved-model verification reproduced all three origins and confirmed all 50
 generated artifacts are present.
 
+## Season 15: sparse grouped forecast reconciliation
+
+```powershell
+.\.venv\Scripts\python -m demandos.reconciliation --root . --config configs/reconciliation.toml
+```
+
+Requires the verified warehouse, Season 13 interpretable N-BEATS artifacts and
+the existing neural environment plus the `reconciliation` SciPy extra. The full
+12-level M5 membership is verified with a sparse **42,840 × 30,490** summing
+matrix and **365,880** nonzeros. The bounded forecasting experiment uses a
+clearly named **398-node / 102-bottom cohort**, preserving the exact original
+13-series continuity view.
+
+Valid saved N-BEATS checkpoints forecast all cohort bottoms; direct observed-
+aggregate seasonal naive supplies independent upper-level forecasts. Bottom-up,
+top-down, store-department middle-out, OLS, structural WLS, historical-variance
+WLS and nonnegative WLS each cover **33,432 identical cases**. Shrinkage MinT is
+implemented, but the actual covariance panel has rank **195/398** (392 paired
+rows, 14 historical origins), so its gate explicitly falls back to diagonal
+WLS. No real MinT score is claimed.
+
+Bottom-up achieves all-level cohort MAE **8.201057**, pooled WAPE **20.1693%** and
+macro RMSSE **0.727991**. The separate 13-bottom view reproduces N-BEATS WAPE
+**42.8239%** exactly; these two cohort/grain scores are not directly comparable.
+The initial maximum incoherence of **539.320287 units** becomes **zero** for
+every reconciled method. The constrained method has zero negative predictions;
+signed OLS/WLS outputs remain explicit.
+
+All six future-sales/price perturbation checks pass. Source fingerprints,
+reference models and the **58,327,370-row** warehouse remain unchanged. The final
+real run took **87.05 s**, with **984.2 MiB** peak process working set. All
+**193 Python tests** and **36 fresh real-data dbt tests** pass. Artifacts remain
+ignored under `data/reconciliation/m5_cohort_h28/`. See
+[reconciliation contracts, level results and reproduction](docs/reconciliation.md)
+for historical fitting cutoffs, covariance fallbacks and limitations. Results
+are cohort metrics, not official M5 WRMSSE.
+
 See [architecture](docs/architecture.md) and the
 [foundation decision](docs/decisions/0001-project-foundation.md) for scope and
 design rationale.

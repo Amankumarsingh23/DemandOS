@@ -67,6 +67,8 @@ Thumbs.db
 /data/.nbeats-*/
 /data/tft/
 /data/.tft-*/
+/data/reconciliation/
+/data/.reconciliation-*/
 /catboost_info/
 /dbt/target/
 /dbt/logs/

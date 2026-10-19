@@ -321,3 +321,18 @@ Attention masks exclude padded/later keys while independent feature generation
 and future-data perturbation tests enforce availability. Known-future calendar
 inputs distinguish the system from target-only N-BEATS; comparisons are not
 architecture-only ablations. See [TFT details and measured results](tft.md).
+
+## Season 15 grouped point reconciliation
+
+`demandos.reconciliation` adds full sparse M5 membership and a bounded 102-bottom
+experiment with independent N-BEATS/observed-aggregate seasonal-naive bases.
+Bottom-up, trailing-year top-down, store-department middle-out, OLS, structural
+and historical-variance WLS, supported shrinkage MinT and constrained nonnegative
+least squares share exact node/origin/target/horizon keys. Every solution maps
+through bottom estimates and `S`; aggregate predictions are never clipped
+independently. The real covariance sample is underdetermined, so MinT's explicit
+gate selects diagonal WLS and no MinT score is claimed. Train-prefix node scales,
+common-case level/origin/horizon metrics and a separate 13-bottom continuity view
+preserve interpretation. Six real perturbation gates verify that future sales
+and prices cannot change origin-issued forecasts. See [methods, exact provenance,
+real results and limitations](reconciliation.md).

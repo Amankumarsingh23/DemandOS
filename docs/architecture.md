@@ -305,3 +305,16 @@ sales mutation/removal must preserve inputs, forecasts and interpretations.
 Reference predictions are checked against Seasons 12/13 provenance, actuals,
 scales and shared keys before ranking. No existing model interface or permanent
 warehouse table changes. See [TFT contracts and reproducibility](tft.md).
+
+Season 15's `reconciliation` package creates deterministic sparse matrices and
+maps for all 12 crossed M5 groupings. Full membership is checked independently
+against warehouse aggregates; bounded solvers operate only on an explicitly
+named cohort. Existing interpretable N-BEATS checkpoints supply bottoms and
+direct observed-history seasonal naive supplies independent aggregate bases.
+Top-down/middle-out shares use only origin-prefix sales; historical per-origin
+refits generate paired OOS errors before the frozen covariance cutoff. Rank,
+support and conditioning gates label covariance fallbacks explicitly. QR and
+NNLS produce bottom estimates, followed by sparse aggregation for exact
+coherence. Real future-sales/price perturbation and source/warehouse hash checks
+gate manifest publication. No earlier pipeline, permanent warehouse relation
+or model implementation changes. See [reconciliation contracts](reconciliation.md).

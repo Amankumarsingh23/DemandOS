@@ -1,0 +1,12 @@
+[reconciliation]
+share_days = 365
+max_bottom = 128
+calibration_start = "2014-12-07"
+calibration_origins = 14
+calibration_stride = 28
+calibration_epochs = 2
+covariance_cutoff = "2016-01-03"
+shrinkage = 0.9
+ridge = 0.000001
+min_covariance_origins = 8
+min_covariance_rows = 56
