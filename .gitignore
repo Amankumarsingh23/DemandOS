@@ -63,6 +63,8 @@ Thumbs.db
 /data/.intermittent-*/
 /data/neural/
 /data/.neural-*/
+/data/nbeats/
+/data/.nbeats-*/
 /catboost_info/
 /dbt/target/
 /dbt/logs/

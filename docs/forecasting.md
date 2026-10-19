@@ -296,3 +296,16 @@ early stopping precede the existing retrospective origin-specific comparisons.
 Softplus outputs are inverse-scaled to original sales units. Future actuals are
 never decoder inputs. Cold/short-history mask support does not establish forecast
 accuracy for unseen products. See [architecture, commands and results](neural.md).
+
+## Season 13 target-only residual forecasting
+
+`demandos.nbeats` adds generic learned-basis and interpretable polynomial/weekly-
+Fourier stacks. Input sales remain oldest-to-newest, with masks enforced through
+all backward residual updates. Forecast contributions accumulate from zero;
+future forecast MSE is the sole objective. Own-origin scales exclude padding,
+and raw components are preserved before inverse-scaling/nonnegative scoring.
+December-selected epochs and complete-vector eligibility follow Season 12.
+Earlier benchmark predictions are reused only after provenance and exact-case
+reconciliation. No calendar, price or categorical embedding enters N-BEATS;
+comparisons with covariate-enriched methods reflect this feature-set difference.
+See [basis definitions, measured results and limitations](nbeats.md).

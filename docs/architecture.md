@@ -273,3 +273,19 @@ prices/labels must preserve regenerated tensors and predictions at all origins.
 The existing LightGBM/TSB/seasonal-naive implementations supply matched references.
 Source hashes and warehouse totals gate manifest-based artifact publication.
 See [neural contracts and reproducibility](neural.md).
+
+Season 13's `nbeats` package composes the same daily panel and temporal validators
+with a target-only adapter: sales, valid-history mask and an own-origin scale.
+Generic dense blocks learn backcast/forecast projections; structured stacks use
+fixed polynomial and weekly Fourier bases. Every block subtracts its backcast
+from masked history and contributes additively to the future forecast. Interpretable
+weights are tied within each stack; generic blocks are independent by default.
+
+Forecast-only normalized MSE and December-selected epochs precede origin refits.
+Raw block contributions reconcile with total forecasts; clipping adjustments
+reconcile nonnegative scored forecasts separately. Cached Season 12 references
+must match source hashes, configs, freshly selected cohorts, fit cutoffs, actuals
+and RMSSE scales. Future mutation/removal and serialization checks, followed by
+source/warehouse checks, gate manifest-based publication. Nothing injects future
+covariates or turns model-attributed components into verified causes. See
+[N-BEATS contracts and reproducibility](nbeats.md).

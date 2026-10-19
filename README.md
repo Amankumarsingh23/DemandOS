@@ -4,7 +4,7 @@ DemandOS is a learning-driven retail demand intelligence project. Its goal is to
 turn credible sales forecasts and uncertainty estimates into cost-aware inventory
 decisions.
 
-## Current milestone: Season 12 — global LSTM and GRU forecasting
+## Current milestone: Season 13 — generic and interpretable N-BEATS
 
 This repository contains validated M5 ingestion and a local DuckDB/dbt retail
 analytics warehouse, with reproducible retail EDA, figures, and ABC/XYZ and
@@ -22,7 +22,9 @@ Origin-safe intermittency diagnostics, a global hurdle mean model, cold-history
 simulations, supported category priors and frozen segment policies are now
 implemented separately. Global PyTorch LSTM and GRU encoders now add masked
 56-day sequences and direct 28-day observed-sales forecasts with chronological
-validation and train-only preprocessing. Inventory optimization,
+validation and train-only preprocessing. Target-only generic and interpretable
+N-BEATS now add backcast residuals, additive forecasts and attributed polynomial/
+weekly-Fourier components. Inventory optimization,
 APIs, and dashboards remain future work. Generated
 datasets, forecasts, and reports stay
 outside Git; verified results are documented below.
@@ -698,6 +700,53 @@ Ignored outputs under `data/neural/global_h28/` include model/preprocessing
 state, loss curves, predictions, matched metrics, coverage, paired losses,
 timings, tensor/leakage checks, figures, JSON summary and a Markdown report.
 See [neural contracts, measured results and verification commands](docs/neural.md).
+
+## Season 13: target-only N-BEATS
+
+Using the existing PyTorch environment and verified Season 12 reference artifacts:
+
+```powershell
+.\.venv\Scripts\python -m demandos.nbeats --root . --config configs/nbeats.toml
+```
+
+Both variants consume **56 observed-sales days plus a valid-history mask** and
+produce **28 forecasts**, without calendars, prices, SNAP or ID embeddings.
+Generic N-BEATS uses three independent dense residual blocks with learned bases;
+interpretable N-BEATS uses two shared trend applications followed by two shared
+weekly-seasonality applications. Backcasts subtract from masked residuals and
+block forecasts add from zero. Raw components are retained before nonnegative
+scoring; the attributed components are not causal explanations.
+
+Real M5 training reuses **96 series**, **4,704 development + 96 validation
+windows**, and **5,088 / 5,280 / 5,472** eligible vectors at the three evaluation
+origins. December selects **two epochs for each variant** within a fixed 15-epoch
+budget. Generic/interpretable models have **41,040 / 25,236 parameters**.
+
+| Model | MAE | Pooled WAPE | Macro RMSSE |
+|---|---:|---:|---:|
+| Interpretable N-BEATS | 12.357747 | 42.8239% | 0.712729 |
+| Generic N-BEATS | 12.527406 | 43.4118% | 0.712214 |
+| GRU | 12.892712 | 44.6777% | 0.723991 |
+| Pooled LightGBM | 12.897550 | 44.6945% | 0.724525 |
+| TSB | 13.015273 | 45.1024% | 0.729239 |
+| LSTM | 13.115248 | 45.4489% | 0.732582 |
+| Seasonal naive | 13.131868 | 45.5065% | 0.788598 |
+
+All seven methods share exactly **1,092 targets** each, with 38 defined RMSSE
+cases and one undefined scale. Interpretable has the lowest pooled MAE/WAPE;
+generic has the lowest macro RMSSE. LightGBM still performs better in the first
+week and on the eight lumpy series. This previously examined 13-series benchmark,
+with different feature sets, does not establish universal architecture superiority.
+
+All six real N-BEATS origin checks pass future-sales mutation/removal, price/label
+exclusion, checkpoint reload and component reconciliation. Original source
+fingerprints and warehouse totals remain unchanged. Initial experiment runtime
+was **93.75 seconds** on two CPU threads, reusing checked Season 12 reference
+predictions. Generated checkpoints, block/component tables, metrics, coverage,
+training curves, five figures and reports remain ignored under
+`data/nbeats/global_h28/`. See [N-BEATS contracts and results](docs/nbeats.md).
+All **150 Python tests** passed without skips, including 16 new N-BEATS tests;
+all **36 fresh real-data dbt tests** passed without warnings or failures.
 
 See [architecture](docs/architecture.md) and the
 [foundation decision](docs/decisions/0001-project-foundation.md) for scope and

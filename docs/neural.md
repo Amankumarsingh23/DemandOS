@@ -214,3 +214,12 @@ Source hashes and the 58,327,370-row warehouse totals remained unchanged.
 The full suite contains **134 Python tests**, including 16 new neural tests;
 the real warehouse has **36 dbt tests**. Final execution evidence is retained
 locally alongside the ignored artifacts.
+
+## Season 13 extension
+
+[N-BEATS](nbeats.md) reuses the full-vector schedule, cohort, seed/loader and metric
+contracts with a separate target-only adapter. It uses no recurrent state or
+future covariates: dense backcast/forecast blocks subtract masked residuals and
+accumulate forecasts. Original LSTM/GRU implementations and artifacts remain
+unchanged. Target-only versus covariate-enriched comparisons do not isolate
+architecture alone.
