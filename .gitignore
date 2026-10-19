@@ -65,6 +65,8 @@ Thumbs.db
 /data/.neural-*/
 /data/nbeats/
 /data/.nbeats-*/
+/data/tft/
+/data/.tft-*/
 /catboost_info/
 /dbt/target/
 /dbt/logs/

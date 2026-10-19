@@ -223,3 +223,13 @@ future covariates: dense backcast/forecast blocks subtract masked residuals and
 accumulate forecasts. Original LSTM/GRU implementations and artifacts remain
 unchanged. Target-only versus covariate-enriched comparisons do not isolate
 architecture alone.
+
+## Season 14 extension
+
+[The point TFT](tft.md) consumes the same historical/future/static tensors and
+train-only preprocessing, adding three VSNs, four static context encoders,
+GRN/GLU gating, an LSTM encoder-decoder and interpretable temporal attention.
+Past padding is skipped in recurrence and excluded as attention keys. Only
+known-ahead covariates enter the decoder; no actual future targets are used.
+Its linear point/MSE head deliberately leaves quantile forecasting to later work.
+Internal attention/selection diagnostics do not establish causal feature effects.

@@ -1,0 +1,17 @@
+[tft]
+lookback = 56
+horizon = 28
+hidden_size = 32
+heads = 4
+embedding_dim = 4
+dropout = 0.1
+batch_size = 128
+epochs = 8
+patience = 2
+learning_rate = 0.001
+weight_decay = 0.0001
+clip_norm = 1.0
+threads = 2
+seed = 42
+device = "cpu"
+max_windows = 8192

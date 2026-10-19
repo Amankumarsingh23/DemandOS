@@ -289,3 +289,19 @@ and RMSSE scales. Future mutation/removal and serialization checks, followed by
 source/warehouse checks, gate manifest-based publication. Nothing injects future
 covariates or turns model-attributed components into verified causes. See
 [N-BEATS contracts and reproducibility](nbeats.md).
+
+Season 14's `tft` package reuses Season 12's exact historical/future/static
+sequence contract and train-only preprocessor. A static VSN feeds four context
+GRNs for temporal selection, initial hidden/cell state and enrichment. Separate
+past/future VSNs transform and select variables before an LSTM encoder-decoder.
+Gated skips, enrichment and shared-value/averaged-head attention fuse temporal
+information before a linear point head. Packed recurrence and attention masks
+exclude padding independently of future-data availability checks.
+
+Point MSE and December-selected epochs precede the origin-specific refits. TFT
+diagnostics preserve variable axes and key dates, with normalized selection/
+attention probabilities and exactly zero forbidden weights. Frozen-state future
+sales mutation/removal must preserve inputs, forecasts and interpretations.
+Reference predictions are checked against Seasons 12/13 provenance, actuals,
+scales and shared keys before ranking. No existing model interface or permanent
+warehouse table changes. See [TFT contracts and reproducibility](tft.md).

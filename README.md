@@ -4,7 +4,7 @@ DemandOS is a learning-driven retail demand intelligence project. Its goal is to
 turn credible sales forecasts and uncertainty estimates into cost-aware inventory
 decisions.
 
-## Current milestone: Season 13 — generic and interpretable N-BEATS
+## Current milestone: Season 14 — Temporal Fusion Transformer
 
 This repository contains validated M5 ingestion and a local DuckDB/dbt retail
 analytics warehouse, with reproducible retail EDA, figures, and ABC/XYZ and
@@ -24,7 +24,9 @@ implemented separately. Global PyTorch LSTM and GRU encoders now add masked
 56-day sequences and direct 28-day observed-sales forecasts with chronological
 validation and train-only preprocessing. Target-only generic and interpretable
 N-BEATS now add backcast residuals, additive forecasts and attributed polynomial/
-weekly-Fourier components. Inventory optimization,
+weekly-Fourier components. A compact global point TFT now adds static/past/future
+variable selection, gated residual networks, recurrent local processing and
+masked shared-value temporal attention. Inventory optimization,
 APIs, and dashboards remain future work. Generated
 datasets, forecasts, and reports stay
 outside Git; verified results are documented below.
@@ -747,6 +749,70 @@ training curves, five figures and reports remain ignored under
 `data/nbeats/global_h28/`. See [N-BEATS contracts and results](docs/nbeats.md).
 All **150 Python tests** passed without skips, including 16 new N-BEATS tests;
 all **36 fresh real-data dbt tests** passed without warnings or failures.
+
+## Season 14: compact global point TFT
+
+Use the existing PyTorch environment, verified warehouse and Season 12/13
+reference artifacts:
+
+```powershell
+.\.venv\Scripts\python -m demandos.tft --root . --config configs/tft.toml
+```
+
+The TFT combines static embeddings and three Variable Selection Networks,
+contextual Gated Residual Networks with GLU/LayerNorm, a static-initialized LSTM
+encoder-decoder, static enrichment, interpretable shared-value/averaged-head
+attention and gated skip pathways. A linear point head replaces the original
+quantile heads; this season implements normalized MSE point forecasting only.
+
+Inputs preserve **past `[B,56,10]`, future-known `[B,28,7]`, static `[B,5]`**;
+outputs are **`[B,28]`**. Prices stay unavailable without verified as-of evidence.
+Future realized sales/prices never enter the decoder. Training-only vocabularies
+and normalization, observed-history masks, packed recurrence and causal/padding
+attention masks preserve the temporal contract. Scheduled calendars remain an
+explicit known-ahead assumption.
+
+The fixed architecture uses hidden size 32, four attention heads and dropout 0.1.
+December validation selects five epochs within an eight-epoch cap. Source data,
+checkpoints, predictions, VSN/attention diagnostics, figures and reports remain
+ignored under `data/tft/global_h28/`. Diagnostics describe internal model behavior,
+not causal effects, stockouts or price elasticity. See
+[TFT architecture, commands and measured results](docs/tft.md).
+
+The verified model has **184,335 parameters**, selected at epoch 5 with December
+validation MSE **1.550650**. It trains on the same **96 series**, with **4,704
+development + 96 validation vectors** and **5,088 / 5,280 / 5,472** eligible
+vectors for January 31 / February 28 / March 27, 2016 refits.
+
+| Model | MAE | Pooled WAPE | Macro RMSSE |
+|---|---:|---:|---:|
+| Interpretable N-BEATS | 12.357747 | 42.8239% | 0.712729 |
+| Generic N-BEATS | 12.527406 | 43.4118% | 0.712214 |
+| GRU | 12.892712 | 44.6777% | 0.723991 |
+| Pooled LightGBM | 12.897550 | 44.6945% | 0.724525 |
+| TSB | 13.015273 | 45.1024% | 0.729239 |
+| LSTM | 13.115248 | 45.4489% | 0.732582 |
+| TFT | 13.297411 | 46.0801% | 0.742327 |
+| Seasonal naive | 13.131868 | 45.5065% | 0.788598 |
+
+All eight systems share exactly **1,092 successful targets** each; RMSSE has 38
+defined cases and one undefined scale. TFT's pooled MAE/WAPE is worse than the
+existing baselines in this limited retrospective experiment. Its small first-week
+gain over interpretable N-BEATS does not hold across longer horizons or the
+smooth/lumpy groups. No benchmark-based retuning was performed.
+
+Mean VSN weights emphasize category, historical sales and future horizon/weekday;
+attention emphasizes historical context. These are internal diagnostics, not
+causal explanations. All three real origin checks pass future-sales mutation/
+removal, price/label exclusion, checkpoint/preprocessing reload and probability/
+mask assertions, with **zero forecast difference**. Source fingerprints and
+warehouse totals are unchanged. The initial bounded experiment took **814.48 s**
+on two CPU threads, reusing verified prior predictions. See the guide for measured
+fit/inference times, case variation, resource limits and interpretation caveats.
+All **167 Python tests** passed without skips, including 17 TFT tests. All
+**36 fresh real-data dbt tests** passed without warnings or failures. Independent
+saved-model verification reproduced all three origins and confirmed all 50
+generated artifacts are present.
 
 See [architecture](docs/architecture.md) and the
 [foundation decision](docs/decisions/0001-project-foundation.md) for scope and

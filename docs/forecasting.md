@@ -309,3 +309,15 @@ Earlier benchmark predictions are reused only after provenance and exact-case
 reconciliation. No calendar, price or categorical embedding enters N-BEATS;
 comparisons with covariate-enriched methods reflect this feature-set difference.
 See [basis definitions, measured results and limitations](nbeats.md).
+
+## Season 14 temporal fusion
+
+`demandos.tft` adds static/past/future variable selection, contextual gated residual
+networks, recurrent local processing, static enrichment and interpretable masked
+attention with shared values and averaged heads. A raw linear point forecast is
+inverse-scaled before nonnegative scoring. The existing normalization, complete-
+vector cutoffs and December epoch-selection policy remain unchanged.
+Attention masks exclude padded/later keys while independent feature generation
+and future-data perturbation tests enforce availability. Known-future calendar
+inputs distinguish the system from target-only N-BEATS; comparisons are not
+architecture-only ablations. See [TFT details and measured results](tft.md).
