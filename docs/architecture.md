@@ -257,3 +257,19 @@ and separate cohorts/common-key comparisons prevent misleading rankings. Real
 future perturbations regenerate features, diagnoses and priors before comparing
 loaded-model and frozen-policy outputs. No inventory/availability ground truth
 is introduced. See [sparse sales and cold-start contracts](intermittent.md).
+
+Season 12's `neural` package reuses bounded cohort selection, warehouse projections,
+calendar assumptions and exact-grain metric helpers. Its indexed sequence builder
+separates historical predictors, scheduled future covariates and complete target
+vectors. Global preprocessing is fitted only on eligible windows; each input scale
+uses its own observed prefix. Masks distinguish padding from measured zero sales.
+Static vocabularies reserve unknown IDs without learning evaluation categories.
+
+Genuine PyTorch LSTM and GRU models use the same embedding and direct-head design.
+December chronological validation selects epochs; later refits consume only full
+vectors ending on/before issuance. Saved state dictionaries and JSON preprocessing
+are reloaded for forecast checks. Mutation/deletion of future sales and changes to
+prices/labels must preserve regenerated tensors and predictions at all origins.
+The existing LightGBM/TSB/seasonal-naive implementations supply matched references.
+Source hashes and warehouse totals gate manifest-based artifact publication.
+See [neural contracts and reproducibility](neural.md).

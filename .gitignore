@@ -61,6 +61,8 @@ Thumbs.db
 /data/.strategies-*/
 /data/intermittent/
 /data/.intermittent-*/
+/data/neural/
+/data/.neural-*/
 /catboost_info/
 /dbt/target/
 /dbt/logs/

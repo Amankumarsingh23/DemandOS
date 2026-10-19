@@ -1,0 +1,2 @@
+# Tested CPU wheel; first install from the PyTorch CPU index (see docs/neural.md).
+torch==2.14.1+cpu

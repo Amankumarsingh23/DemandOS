@@ -4,7 +4,7 @@ DemandOS is a learning-driven retail demand intelligence project. Its goal is to
 turn credible sales forecasts and uncertainty estimates into cost-aware inventory
 decisions.
 
-## Current milestone: Season 11 — sparse sales and cold starts
+## Current milestone: Season 12 — global LSTM and GRU forecasting
 
 This repository contains validated M5 ingestion and a local DuckDB/dbt retail
 analytics warehouse, with reproducible retail EDA, figures, and ABC/XYZ and
@@ -20,7 +20,9 @@ now compares pooled, recursive, direct horizon-specific and independent vector
 forecasting, plus an earlier-validation-selected ensemble.
 Origin-safe intermittency diagnostics, a global hurdle mean model, cold-history
 simulations, supported category priors and frozen segment policies are now
-implemented separately. Inventory optimization,
+implemented separately. Global PyTorch LSTM and GRU encoders now add masked
+56-day sequences and direct 28-day observed-sales forecasts with chronological
+validation and train-only preprocessing. Inventory optimization,
 APIs, and dashboards remain future work. Generated
 datasets, forecasts, and reports stay
 outside Git; verified results are documented below.
@@ -646,6 +648,56 @@ perturbation checks passed; all **118 Python tests** passed without skips.
 All **36 fresh real-data dbt tests** passed.
 The final measured experiment took **246.12 seconds**. Detailed calibration,
 conditional-positive errors, support, timing and limitations are in the report.
+
+## Season 12: global LSTM and GRU forecasts
+
+Install the CPU PyTorch wheel, then the optional neural extra in the existing
+analytics/EDA/boosting environment:
+
+```powershell
+.\.venv\Scripts\python -m pip install torch -c configs/neural-constraints.txt --index-url https://download.pytorch.org/whl/cpu
+.\.venv\Scripts\python -m pip install -e ".[analytics,eda,boosting,neural]" -c configs/analytics-constraints.txt -c configs/boosting-constraints.txt -c configs/neural-constraints.txt
+.\.venv\Scripts\python -m demandos.neural --root . --config configs/neural.toml
+```
+
+Both genuine recurrent encoders use 56-day historical inputs, observed-history
+masks, training-only static embeddings and scheduled calendar covariates for
+direct 28-day point forecasts. Prices remain unavailable without verified as-of
+evidence. Complete-vector fitting cutoffs and December validation prevent future
+labels from entering training or epoch selection. Checkpoints persist weights,
+normalization and vocabularies. Padding never becomes an observed zero.
+
+The verified real experiment trains on **96 series**, with **4,704 development
+windows + 96 validation windows**, then **5,088 / 5,280 / 5,472** complete
+vectors at January 31 / February 28 / March 27, 2016. December selects 12 LSTM
+and 3 GRU refit epochs. On identical **1,092 observed-sales targets per model**:
+
+| Model | MAE | Pooled WAPE | Macro RMSSE |
+|---|---:|---:|---:|
+| GRU | 12.892712 | 44.6777% | 0.723991 |
+| Pooled LightGBM | 12.897550 | 44.6945% | 0.724525 |
+| TSB | 13.015273 | 45.1024% | 0.729239 |
+| LSTM | 13.115248 | 45.4489% | 0.732582 |
+| Seasonal naive | 13.131868 | 45.5065% | 0.788598 |
+
+GRU's tiny pooled advantage is inconsistent across origins; this previously
+examined 13-series benchmark does not establish a general neural-model ranking.
+All forecasts succeed; RMSSE has 38 defined cases and one undefined training
+scale. These are selected-cohort metrics, not official M5 WRMSSE.
+
+LSTM/GRU have **8,001 / 6,593 parameters**. Local evaluation fits take
+**17.06–18.65 / 6.96–7.86 seconds**. Model reloads and future-sales removal,
+future-sales/price/label perturbations pass at all three origins. Source hashes
+and warehouse totals remain unchanged. Short/cold-history mask checks establish
+input support, not validated cold-start accuracy. The initial full experiment
+took **373.4 seconds** on two CPU threads; no GPU is required.
+All **134 Python tests** passed without skips, and all **36 fresh real-data dbt
+tests** passed without warnings or failures.
+
+Ignored outputs under `data/neural/global_h28/` include model/preprocessing
+state, loss curves, predictions, matched metrics, coverage, paired losses,
+timings, tensor/leakage checks, figures, JSON summary and a Markdown report.
+See [neural contracts, measured results and verification commands](docs/neural.md).
 
 See [architecture](docs/architecture.md) and the
 [foundation decision](docs/decisions/0001-project-foundation.md) for scope and

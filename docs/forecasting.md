@@ -286,3 +286,13 @@ their own rules. Comparisons retain cohort-specific exact shared keys, explicit
 skip support, occurrence calibration and conditional-positive error. No missing
 price or observed zero is treated as proof of a stockout. See
 [contracts, commands and measured Season 11 results](intermittent.md).
+
+## Season 12 recurrent extension
+
+`demandos.neural` adds global LSTM and GRU encoders with 56-day historical windows,
+static embeddings and scheduled calendar inputs for direct 28-day forecasts.
+Train-only normalization, history masks, complete-vector cutoffs and December
+early stopping precede the existing retrospective origin-specific comparisons.
+Softplus outputs are inverse-scaled to original sales units. Future actuals are
+never decoder inputs. Cold/short-history mask support does not establish forecast
+accuracy for unseen products. See [architecture, commands and results](neural.md).
