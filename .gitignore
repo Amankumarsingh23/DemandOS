@@ -75,6 +75,8 @@ Thumbs.db
 /data/.conformal-*/
 /data/inventory/
 /data/.inventory-*/
+/data/simulation/
+/data/.simulation-*/
 /catboost_info/
 /dbt/target/
 /dbt/logs/

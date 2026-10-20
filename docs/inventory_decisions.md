@@ -286,6 +286,11 @@ audit and fresh dbt result fingerprint; it is not a replacement for running test
 
 ## References
 
+Season 19 now extends these frozen planning inputs with a separate
+[sequential simulator](inventory_simulation.md), multiple orders, FIFO backlog,
+explicit operational costs and daily state transitions. It preserves this
+season's single-order results and their own receipt convention.
+
 The objective and policy terminology follow the inventory topics in
 [MIT D-Lab: Supply Chains](https://ocw.mit.edu/courses/15-772j-d-lab-supply-chains-fall-2014/),
 especially [Lecture 14: Stochastic-demand Inventory Models](https://ocw.mit.edu/courses/15-772j-d-lab-supply-chains-fall-2014/resources/mit15_772jf14_lec14/).

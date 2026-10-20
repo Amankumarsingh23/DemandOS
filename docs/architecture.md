@@ -351,3 +351,14 @@ state/cost/lead settings. Future mutation/removal, source/forecast/checkpoint
 hashes and warehouse totals gate ignored manifest publication. No permanent
 warehouse, earlier-model or model-training changes; see [inventory decision
 assumptions and results](inventory_decisions.md).
+
+Season 19's `simulation` package adds an event-ordered daily state machine,
+immutable observable-state/policy contracts, an order-ID delivery queue and
+FIFO backlog cohorts. Supplier streams use calendar issue-day keys rather
+than order-count PRNG state. Streaming matched-case Parquet groups keep memory
+bounded; cost/service and paired series-origin metrics are independent of policy
+logic. Engine conservation plus independent persisted-output SQL, origin-prefix
+regeneration and pre-mutation-day state/action tests gate generated publication.
+Real 28-day paths, bootstrap sensitivities and shared-tail warm-up runs have
+separate identifiers. No earlier model/warehouse or Season 18 interface changes.
+See [sequential simulation contracts](inventory_simulation.md).

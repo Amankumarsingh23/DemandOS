@@ -1,0 +1,44 @@
+[simulation]
+seed = 42
+replications = 2
+sources = ["historical_fractile", "point_mean_heuristic", "s16_quantile_paths", "s17_rolling_width_paths"]
+rules = ["rQ", "rS", "RS"]
+first_review_day = 1
+fixed_quantity = 20
+on_hand = 10
+on_order = 3
+mode = "lost_sales"
+review_days = 7
+multiple = 1
+minimum = 0
+sales_as_demand = true
+
+# Hypothetical operating costs. Purchase uses the explicit Season 18 c=60.
+# No Season 18 overage/underage mismatch cost is added to this ledger.
+[operations.balanced]
+holding = 0.2
+lost_penalty = 40.0
+backlog_daily = 2.0
+order_fee = 5.0
+
+[operations.shortage_expensive]
+holding = 0.2
+lost_penalty = 180.0
+backlog_daily = 9.0
+order_fee = 5.0
+
+[operations.overage_expensive]
+holding = 2.0
+lost_penalty = 10.0
+backlog_daily = 0.5
+order_fee = 5.0
+
+# Each study holds all other settings at the balanced/fixed-7 baseline, rep 0.
+[sensitivity]
+studies = ["backorders", "stock_0", "stock_100", "open_0", "review_3", "weekend_delay", "terminal_salvage", "bootstrap_block", "bootstrap_independent"]
+
+[warmup]
+durations = [0, 28, 56]
+scored_days = 56
+replications = 2
+series_per_cohort = 1

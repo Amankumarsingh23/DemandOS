@@ -975,6 +975,53 @@ No new dependencies or earlier-model changes. Ignored outputs live under
 `data/inventory/m5_h28/`. See [equations, assumptions, full matched results,
 dependence/regime sensitivity and reproduction](docs/inventory_decisions.md).
 
+## Season 19: sequential inventory simulation
+
+```powershell
+.\.venv\Scripts\python -m demandos.simulation --root . --config configs/simulation.toml
+```
+
+Stateful daily simulation adds a delivery queue, FIFO backorders or lost sales,
+daily-review `(r,Q)`/`(r,S)` and periodic `(R,S)` policies. Opening receipts precede
+old-backlog fulfillment and current demand; day-end orders arrive at `t+L`
+opening. The policy API exposes permitted stock/pipeline/fulfilled-sales history,
+with frozen origin-derived targets and shared calendar-keyed supplier shocks.
+
+Operational costs separately track holding, lost-sales/backlog, ordering and
+procurement; Season 18 mismatch costs are not added again. Procurement is paid
+at order, including terminal pipeline. Immediate unit fill and daily no-shortage
+rate remain distinct; no undefined replenishment-cycle CSL is claimed.
+
+The experiment keeps the original 75 recorded-sales paths and all 28 scored
+days, with separate supplier replications, nine initialization/mode/review/
+lead/terminal/demand sensitivities, and an origin-safe common-tail warm-up study.
+All results are **SCENARIO-BASED / SIMULATED**, not observed Walmart inventory
+behavior, uncensored demand, actual stockouts, profit or savings. Forecasts
+remain frozen at each origin; this does not claim genuine daily reforecasting.
+
+Ignored artifacts: `data/simulation/m5_h28/`. See [event order, conservation,
+cost/service rules, paired comparisons and reproduction](docs/inventory_simulation.md).
+
+Verified execution: **16,200 main runs / 453,600 main daily rows**, plus separate
+sensitivity/warm-up studies totaling **24,372 runs / 686,448 daily rows**.
+There remain only **75 unique real recorded-sales paths / 2,100 daily targets**.
+All **289 Python tests**, **36 fresh dbt tests**, **1,125 sequential temporal
+checks**, **225 frozen-origin checks** and **19 independent saved-file SQL gates**
+pass. Source/model hashes and the **58,327,370-row warehouse** remain unchanged.
+
+| Balanced/fixed-7 periodic RS, simulated | Continuity cost/run | Immediate fill | Stress cost/run | Immediate fill |
+|---|---:|---:|---:|---:|
+| Historical cost-fractile | 57315.62 | 70.07% | 1622.49 | 80.44% |
+| Saved point heuristic | 55856.38 | 67.11% | 1801.77 | 86.64% |
+| Season 16 assumed paths | 48516.02 | 57.37% | 1771.45 | 85.31% |
+| Season 17 rolling-width paths | 51146.59 | 61.12% | 1750.98 | 83.72% |
+
+Costs are hypothetical INR operational costs, including procurement. Lower
+cost can mean less service. Initial-stock capital, terminal pipeline and backlog
+accounting materially affect comparisons; these are not measured savings.
+Execution took **920.76 s / 931.50 MiB peak**; the independent audit took
+**22.55 s / 1657.99 MiB peak**. No cases were skipped.
+
 See [architecture](docs/architecture.md) and the
 [foundation decision](docs/decisions/0001-project-foundation.md) for scope and
 design rationale.
