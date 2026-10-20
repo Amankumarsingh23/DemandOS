@@ -286,6 +286,10 @@ audit and fresh dbt result fingerprint; it is not a replacement for running test
 
 ## References
 
+Season 20 now adds [shared-resource allocation](optimization.md), retaining
+these forecast/scenario assumptions. Its expected mismatch objective and the
+simulator's procurement-inclusive operating costs remain distinct.
+
 Season 19 now extends these frozen planning inputs with a separate
 [sequential simulator](inventory_simulation.md), multiple orders, FIFO backlog,
 explicit operational costs and daily state transitions. It preserves this

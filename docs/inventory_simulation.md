@@ -1,5 +1,9 @@
 # Season 19: sequential inventory simulation
 
+Season 20 extends the same timeline through an additive `steps(...)` interface
+for [coordinated propose/allocate/commit optimization](optimization.md). The
+`simulate(...)` API and the Season 19 results below remain preserved.
+
 Every result is **SCENARIO-BASED / SIMULATED**. Recorded M5 sales are used as a
 customer-demand proxy, not verified uncensored demand. M5 does not establish
 actual stock, stockouts, supplier delays, backlogs, purchasing costs or savings.

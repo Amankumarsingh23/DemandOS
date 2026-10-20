@@ -68,7 +68,7 @@ class Supplier:
         return lead, str(key), float(uniform)
 
 
-def simulate(demand, origin, policy, costs, supplier, *, on_hand=10, initial_orders=(), mode="lost_sales",
+def steps(demand, origin, costs, supplier, *, on_hand=10, initial_orders=(), mode="lost_sales",
              initial_backlog=0, warmup=0, calendar_offset=0):
     """All evaluator demand stays here; policy sees only immutable observations.
 
@@ -128,7 +128,7 @@ def simulate(demand, origin, policy, costs, supplier, *, on_hand=10, initial_ord
         fulfilled_history.append(immediate)
         observation = Observation(day, calendar_offset+day, date, on_hand, backlog, before_order,
                                   tuple(sorted(queue.values(), key=lambda x: (x.arrival_day, x.order_id))), tuple(fulfilled_history))
-        action = policy.decide(observation)
+        action = yield observation
         quantity = integer(action.quantity)
         if action.action_date != date: raise ValueError("Action timestamp differs from observable decision date")
         lead, shock_id, uniform = supplier.at(calendar_offset+day, date)
@@ -174,3 +174,16 @@ def simulate(demand, origin, policy, costs, supplier, *, on_hand=10, initial_ord
         raise AssertionError("Unreconciled order identities")
     for order in queue.values(): events.append(dict(event="terminal_outstanding", event_day=len(y), **asdict(order)))
     return pd.DataFrame(daily), pd.DataFrame(events)
+
+
+def simulate(demand, origin, policy, costs, supplier, *, on_hand=10, initial_orders=(), mode="lost_sales",
+             initial_backlog=0, warmup=0, calendar_offset=0):
+    """Preserved full-path API; drive the same validated timeline one day at a time."""
+    timeline = steps(demand, origin, costs, supplier, on_hand=on_hand, initial_orders=initial_orders,
+                     mode=mode, initial_backlog=initial_backlog, warmup=warmup, calendar_offset=calendar_offset)
+    try:
+        observation = next(timeline)
+        while True:
+            observation = timeline.send(policy.decide(observation))
+    except StopIteration as finished:
+        return finished.value

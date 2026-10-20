@@ -362,3 +362,14 @@ regeneration and pre-mutation-day state/action tests gate generated publication.
 Real 28-day paths, bootstrap sensitivities and shared-tail warm-up runs have
 separate identifiers. No earlier model/warehouse or Season 18 interface changes.
 See [sequential simulation contracts](inventory_simulation.md).
+
+Season 20's `optimization` package adds sparse LP/MILP allocation with separate
+scenario-mismatch and heuristic-benefit objectives. The original Season 19
+timeline yields each series' post-demand observation; a coordinator collects
+all requests before allocating and committing one order vector. Budget and
+supplier ledgers persist across the horizon, while procurement-flow and store
+order-authorization quotas have explicit epoch scope. Frozen origin inputs,
+candidate sorting, verified integer orders, LP-only dual diagnostics and
+independent persisted resource/engine checks gate publication. Source/model
+fingerprints and warehouse totals remain protected. See [shared optimization
+models and limitations](optimization.md).

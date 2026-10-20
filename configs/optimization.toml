@@ -1,0 +1,39 @@
+[optimization]
+seed = 42
+scenario_samples = 16
+solver_seconds = 3.0
+mip_relative_gap = 0.0
+feasibility_tolerance = 0.0000001
+budget_factors = [0.35, 0.70, 1.40]
+main_lead = "fixed_7"
+planning_source = "historical_fractile"
+review_days = 7
+on_hand = 10
+on_order = 3
+order_fee = 5.0
+purchase = 60.0
+supplier_factor = 1.0
+flow_factor = 0.8
+receiving_factor = 1.0
+pack = 1
+moq = 0
+sales_as_demand = true
+
+# All resources/economics are SCENARIO-ASSUMED, not operational Walmart data.
+# Budget, supplier units: ENTIRE 28-day horizon; no delivery refunds/resets.
+# Warehouse procurement-flow volume, store receiving units: PER REVIEW EPOCH.
+[volume_per_unit]
+FOODS = 1.0
+HOUSEHOLD = 2.0
+HOBBIES = 3.0
+
+[sensitivity]
+studies = ["supplier_scarce", "flow_scarce", "fair_min", "fair_disparity", "case_pack", "quantile_source", "random_lead"]
+budget_factor = 0.70
+supplier_scarce_factor = 0.25
+flow_scarce_factor = 0.25
+minimum_share = 0.20
+maximum_disparity = 0.10
+fairness_soft_penalty = 1000.0
+pack = 6
+moq = 12

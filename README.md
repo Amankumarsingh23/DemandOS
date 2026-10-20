@@ -1022,6 +1022,53 @@ accounting materially affect comparisons; these are not measured savings.
 Execution took **920.76 s / 931.50 MiB peak**; the independent audit took
 **22.55 s / 1657.99 MiB peak**. No cases were skipped.
 
+## Season 20: shared supply allocation optimization
+
+```powershell
+.\.venv\Scripts\python -m demandos.optimization --root . --config configs/optimization.toml
+```
+
+Sparse SciPy/HiGHS LP and MILP models coordinate requests across the selected
+25-series cohort. Budget/supplier commitments persist across 28 days; assumed
+warehouse procurement-flow and store order-intake quotas apply per decision
+epoch. Case packs, MOQ, activation fees, optional fairness preferences, explicit
+infeasibility/status handling and independently verified integer feasibility
+remain separate from LP relaxation/dual diagnostics.
+
+The Season 19 engine now exposes its existing timeline as a day-step generator;
+its full-path API remains intact. Every series proposes before the shared order
+vector is allocated and committed. Historical/forecast scenarios and resource
+reference targets are frozen at each origin. Unconstrained requests are labeled
+as a reference, alongside feasible proportional/greedy baselines, deterministic
+benefit MILP and first-stage expected-mismatch MILP. Procurement-inclusive
+operating cost is evaluated separately from the optimizer's objective.
+
+Exact toy checks include LP value **46**, duals **1.5/2**, capped value **44**,
+knapsack value **17**, integrality gap **7.333333**, infeasible forced commitments,
+and nonanticipative cost **50** versus perfect-information **0** (EVPI **50**).
+All economics/limits/outcomes are **SCENARIO-ASSUMED**, not real Walmart costs or
+savings. Ignored artifacts: `data/optimization/m5_h28/`. See [models, resource
+contracts, temporal gates and measured results](docs/optimization.md).
+
+The final real run completed **240 pool runs / 6,000 series runs / 168,000 daily
+rows** from the original **75 recorded-sales paths**. All **384 main/sensitivity MILPs** and
+**384 LP relaxations** were optimal; maximum MIP gap **0**, no fallbacks/skips.
+
+| Balanced/medium budget, simulated | Continuity cost/run | Immediate fill | Stress cost/run | Immediate fill |
+|---|---:|---:|---:|---:|
+| Feasible proportional | 57291.23 | 69.86% | 1622.12 | 79.56% |
+| Feasible greedy | 57458.80 | 66.13% | 1614.22 | 79.03% |
+| Deterministic MILP | 57245.02 | 69.82% | 1621.97 | 80.35% |
+| Expected-mismatch MILP | 55317.50 | 67.11% | 1578.73 | 76.90% |
+
+Costs are hypothetical INR operational costs. Lower cost here can mean lower
+service; the mismatch optimizer does not claim to minimize the full operating
+ledger. Fairness/pack/scarcity/source/lead sensitivities are separately recorded.
+All **313 Python tests**, **36 fresh dbt tests**, **225 frozen-origin checks**,
+**nine coordinated temporal checks**, and **18 saved-output checks** pass.
+Source/model fingerprints and the **58,327,370-row warehouse** are unchanged.
+Final execution: **127.90 s**, **972.13 MiB** peak process memory.
+
 See [architecture](docs/architecture.md) and the
 [foundation decision](docs/decisions/0001-project-foundation.md) for scope and
 design rationale.

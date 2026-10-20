@@ -77,6 +77,8 @@ Thumbs.db
 /data/.inventory-*/
 /data/simulation/
 /data/.simulation-*/
+/data/optimization/
+/data/.optimization-*/
 /catboost_info/
 /dbt/target/
 /dbt/logs/
