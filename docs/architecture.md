@@ -339,3 +339,15 @@ issuing new intervals. Raw quantiles, score IDs, selected windows and alpha
 updates remain auditable. Independent predictor and calibrator perturbations,
 source hashes and warehouse totals gate ignored manifest publication. See
 [conformal design and empirical limits](conformal.md).
+
+Season 18's `inventory` package consumes source-bound point/quantile/interval
+artifacts plus bounded read-only warehouse history. Core discrete economics,
+path generation, planning and outcome evaluation have separate APIs. No future
+outcomes enter planning. Historical weekday blocks and explicitly assumed
+quantile/rank paths generate lead/protection CDFs; conformal width is only a
+heuristic dispersion sensitivity. Stock targets and receipt-constrained one-order
+execution remain separate, with exact matched cases and explicit hypothetical
+state/cost/lead settings. Future mutation/removal, source/forecast/checkpoint
+hashes and warehouse totals gate ignored manifest publication. No permanent
+warehouse, earlier-model or model-training changes; see [inventory decision
+assumptions and results](inventory_decisions.md).

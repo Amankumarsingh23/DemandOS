@@ -366,3 +366,15 @@ feedback, in fixed deterministic order before the next issue. Cohort/band keys,
 source hashes, predictor/calibrator perturbation gates and same-case daily/joint
 metrics gate publication. Existing January-fitted checkpoints remain separate
 references. See [conformal contracts, exact splits and limitations](conformal.md).
+
+## Season 18 scenario-based decisions
+
+`demandos.inventory` preserves saved point and probabilistic forecasts and
+adds explicit hypothetical costs, inventory state and lead-time distributions.
+Discrete newsvendor targets, cumulative-path ROPs, inventory position and
+order quantities remain distinct. Historical blocks and labeled assumed
+forecast CDFs are sensitivity mechanisms; neither three quantiles nor conformal
+intervals identify a joint lead-time distribution or guarantee service. Bounded
+one-order execution respects delivery timing and reports matched simulated
+cost, CSL, unit fill and clairvoyant lower-bound regret. See [equations,
+forecast provenance, assumptions and measured results](inventory_decisions.md).

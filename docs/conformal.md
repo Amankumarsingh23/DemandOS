@@ -280,7 +280,11 @@ Ignored output root: `data/conformal/m5_h28/`:
   `manifest.json`. All 39 manifest-owned artifacts exist; repeat publication
   replaces only manifest-owned files.
 
-No inventory optimization or later-season decision policies are implemented.
+Season 17 itself does not implement inventory policies. Season 18 consumes its
+saved, origin-safe outputs in a separate [scenario-based inventory decision
+layer](inventory_decisions.md). Rolling interval width is only a labeled
+dispersion heuristic there; its upper endpoint is not an arbitrary service
+quantile and marginal coverage does not guarantee lead-time service.
 
 ## References
 

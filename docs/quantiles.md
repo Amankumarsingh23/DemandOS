@@ -304,6 +304,11 @@ training errors as calibration errors. The same October-frozen model is used
 on both sides of primary split calibration. See [conformal provenance, observed
 zero inclusion and empirical limitations](conformal.md).
 
+Season 18 reuses the saved forecasts in [scenario-based inventory
+decisions](inventory_decisions.md). Explicit tail and dependence assumptions
+complete its simulated paths; P10/P50/P90 alone do not identify those paths
+or an arbitrary cost-fractile cumulative-demand quantile.
+
 ## References
 
 - [scikit-learn mean pinball loss](https://scikit-learn.org/stable/modules/generated/sklearn.metrics.mean_pinball_loss.html).

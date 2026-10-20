@@ -930,6 +930,51 @@ calibrator future-data checks pass. Source/Season 16 hashes and the
 Ignored artifacts: `data/conformal/m5_h28/`. See [conformal mathematics, exact
 provenance, complete results and reproduction](docs/conformal.md).
 
+## Season 18: scenario-based inventory decisions
+
+```powershell
+.\.venv\Scripts\python -m demandos.inventory --root . --config configs/inventory.toml
+```
+
+Discrete newsvendor cost optimization, critical fractiles, lead/protection
+distributions, signed safety offsets, ROP and inventory position feed continuous
+trigger/fixed-quantity/up-to and periodic up-to decisions. Costs and inventory
+states are explicit hypothetical assumptions; **M5 sales-as-demand simulation
+does not establish actual stockouts, Walmart inventory costs or savings**.
+
+Three cost regimes (Cu/Co 40/40, 180/20, 10/50), three lead settings (1, 7,
+or random 2/4/7 days), and seven-day review use 512 weekday-aligned historical
+block paths per series-origin. Saved point, Season 16 quantiles and Season 17
+rolling intervals supply separately labeled forecast-informed assumptions.
+Three quantiles do not identify a full joint distribution; conformal bounds
+are not arbitrary service quantiles. Summed daily medians remain a heuristic.
+
+The verified run covers **25 series × 3 origins**, preserving **1,092 continuity
+and 1,008 stress daily forecast rows**. Seven methods produce **4,725 stock-target
+plans** and **14,175 single-order outcomes** on **675 identical lead/cost cases
+per method/action**. Orders arrive at day L+1 open; pre-receipt shortages cannot
+be served later. Aggregate stock-target costs and timing-constrained execution
+costs remain separate.
+
+| Balanced periodic up-to, simulated | Continuity cost/case | Unit fill | Stress cost/case | Unit fill |
+|---|---:|---:|---:|---:|
+| Historical cost-fractile | 9090.51 | 64.09% | 300.56 | 80.12% |
+| Saved point mean heuristic | 8472.22 | 63.21% | 305.93 | 83.87% |
+| Season 16 assumed quantile paths | 6833.76 | 57.89% | 303.70 | 82.39% |
+| Season 17 rolling-width heuristic | 7253.08 | 60.49% | 313.89 | 79.98% |
+
+Costs are hypothetical INR mismatch costs. A common 10-unit initial on-hand
+state constrains large-volume series before delivery; these results do not
+identify an optimal real inventory policy. The same three lead settings and
+future recorded-sales windows are used for each comparison.
+
+All **263 Python tests** (24 new), **36 fresh dbt tests**, and **225 real future
+sales/price invariance checks** pass. Raw/interim/processed data and prior model
+artifacts retain their hashes; the **58,327,370-row warehouse** remains intact.
+No new dependencies or earlier-model changes. Ignored outputs live under
+`data/inventory/m5_h28/`. See [equations, assumptions, full matched results,
+dependence/regime sensitivity and reproduction](docs/inventory_decisions.md).
+
 See [architecture](docs/architecture.md) and the
 [foundation decision](docs/decisions/0001-project-foundation.md) for scope and
 design rationale.

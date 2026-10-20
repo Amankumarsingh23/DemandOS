@@ -1,0 +1,58 @@
+[inventory]
+seed = 42
+samples = 512
+lookback_days = 365
+block_days = 7
+horizon = 28
+currency = "hypothetical INR"
+sales_as_demand = true
+mode = "lost_sales"
+on_hand = 10
+on_order = 3
+backorders = 0
+fixed_quantity = 20
+order_multiple = 1
+minimum_order = 0
+tail_spread_floor = 1.0
+
+[[costs]]
+name = "balanced"
+price = 100.0
+purchase = 60.0
+salvage = 20.0
+shortage_penalty = 0.0
+overage_penalty = 0.0
+
+[[costs]]
+name = "shortage_expensive"
+price = 100.0
+purchase = 60.0
+salvage = 40.0
+shortage_penalty = 140.0
+overage_penalty = 0.0
+
+[[costs]]
+name = "overage_expensive"
+price = 70.0
+purchase = 60.0
+salvage = 10.0
+shortage_penalty = 0.0
+overage_penalty = 0.0
+
+[[leads]]
+name = "fixed_1"
+days = [1]
+probabilities = [1.0]
+review_days = 7
+
+[[leads]]
+name = "fixed_7"
+days = [7]
+probabilities = [1.0]
+review_days = 7
+
+[[leads]]
+name = "random_2_4_7"
+days = [2, 4, 7]
+probabilities = [0.25, 0.5, 0.25]
+review_days = 7

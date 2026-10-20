@@ -73,6 +73,8 @@ Thumbs.db
 /data/.quantiles-*/
 /data/conformal/
 /data/.conformal-*/
+/data/inventory/
+/data/.inventory-*/
 /catboost_info/
 /dbt/target/
 /dbt/logs/
