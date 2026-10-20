@@ -893,6 +893,43 @@ environment/dependencies suffice. See [quantile methods, actual results and
 reproduction](docs/quantiles.md), including why marginal quantiles cannot be
 summed through Season 15's hierarchy. No conformal or inventory work is included.
 
+## Season 17: conformal calibration and delayed feedback
+
+```powershell
+.\.venv\Scripts\python -m demandos.conformal --root . --config configs/conformal.toml
+```
+
+Absolute-residual split conformal, signed/nonnegative CQR, rolling CQR, a labeled
+recency-weighted heuristic, bounded delayed-feedback ACI and a pathwise max-score
+diagnostic use genuine held-out forecasts. Nested September validation selects
+new models fitted through **2015-10-11**; the same frozen models generate both
+calibration and evaluation forecasts. Season 16 January-fitted checkpoints stay
+separate references. Their in-sample errors are never used as held-out history.
+
+The real run produces **35,000 forecast/score ledger rows** and **39,900 matched
+intervals**, preserving 1,092 continuity and 1,008 separate stress cases per method.
+
+| October-frozen neural method | Continuity coverage | Stress coverage | Stress width | Stress interval score |
+|---|---:|---:|---:|---:|
+| Uncalibrated base | 62.36% | 36.41% | 2.3943 | 4.0202 |
+| Split CQR | 81.96% | 79.76% | 2.4154 | 4.0034 |
+| Rolling CQR | 79.21% | 84.03% | 2.4690 | 3.9839 |
+| Weighted heuristic | 79.30% | 83.73% | 2.4579 | 3.9872 |
+| Bounded ACI | 77.75% | 82.84% | 2.4843 | 3.9861 |
+
+The earlier **37.60%** neural stress result remains an unchanged, different-model
+reference. Corrected ranks, score maturity, nonnegative support and all alpha
+updates are explicit. Rolling windows use 512 scores per cohort/horizon band;
+ACI consumes only mature feedback. Pointwise coverage does not imply trajectory
+coverage, and M5 dependence prevents an exact conditional 80% guarantee.
+
+All **239 Python tests**, **36 fresh dbt tests**, nine predictor and nine
+calibrator future-data checks pass. Source/Season 16 hashes and the
+**58,327,370-row** warehouse are unchanged. Runtime was **290.18 s**, with
+**1,299.6 MiB** peak process working set and zero training warnings/skips.
+Ignored artifacts: `data/conformal/m5_h28/`. See [conformal mathematics, exact
+provenance, complete results and reproduction](docs/conformal.md).
+
 See [architecture](docs/architecture.md) and the
 [foundation decision](docs/decisions/0001-project-foundation.md) for scope and
 design rationale.

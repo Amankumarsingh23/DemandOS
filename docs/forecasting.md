@@ -352,3 +352,17 @@ this is retained as an actual measured limitation. Prefix-sparse stress and
 original continuity cohorts remain separate. Season 15 maps support a bounded
 non-additivity diagnostic, not probabilistic reconciliation. See [quantile
 contracts, measured calibration and reproduction](quantiles.md).
+
+## Season 17 chronological conformal intervals
+
+`demandos.conformal` reuses the Season 16 learners but makes an earlier nested
+selection/refit, with October-frozen predictors shared by calibration and test.
+Explicit forecast/observation ledgers reject fitting- or selection-contaminated
+targets. Absolute, signed/nonnegative CQR and max-trajectory scores use the
+corrected finite-sample rank and an explicit infinite-score policy. Rolling
+windows and weighted heuristic thresholds obey individual target maturity;
+complete paths wait for all 28 labels. Bounded ACI updates only after available
+feedback, in fixed deterministic order before the next issue. Cohort/band keys,
+source hashes, predictor/calibrator perturbation gates and same-case daily/joint
+metrics gate publication. Existing January-fitted checkpoints remain separate
+references. See [conformal contracts, exact splits and limitations](conformal.md).

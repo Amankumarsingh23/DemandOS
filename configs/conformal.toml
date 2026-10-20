@@ -1,0 +1,16 @@
+[conformal]
+alpha = 0.2
+validation_origin = "2015-09-13"
+fit_cutoff = "2015-10-11"
+split_origins = ["2015-10-11", "2015-11-08", "2015-12-06", "2016-01-03"]
+split_end = "2016-01-31"
+issue_stride_days = 7
+rolling_scores = 512
+half_life_days = 28
+aci_start = "2016-01-03"
+aci_gamma = 0.001
+aci_alpha_min = 0.02
+aci_alpha_max = 0.5
+path_min_origins = 3
+path_min_trajectories = 10
+seed = 42

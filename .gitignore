@@ -71,6 +71,8 @@ Thumbs.db
 /data/.reconciliation-*/
 /data/quantiles/
 /data/.quantiles-*/
+/data/conformal/
+/data/.conformal-*/
 /catboost_info/
 /dbt/target/
 /dbt/logs/

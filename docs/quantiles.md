@@ -296,6 +296,14 @@ Previously examined benchmarks limit prospective claims. No calibration offsets
 are fitted to these targets, and no conformal prediction, safety-stock decision,
 inventory simulation, API or dashboard is included.
 
+Season 17 extends these interfaces with a separate nested historical fit,
+genuine held-out calibration ledger, corrected split ranks, rolling/weighted
+CQR and delayed-feedback bounded ACI. It preserves these Season 16 results as
+different-checkpoint references, rather than retrospectively treating January
+training errors as calibration errors. The same October-frozen model is used
+on both sides of primary split calibration. See [conformal provenance, observed
+zero inclusion and empirical limitations](conformal.md).
+
 ## References
 
 - [scikit-learn mean pinball loss](https://scikit-learn.org/stable/modules/generated/sklearn.metrics.mean_pinball_loss.html).

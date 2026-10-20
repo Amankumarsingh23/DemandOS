@@ -328,3 +328,14 @@ from prefix-sparse stress. Frozen January weights, origin-only history/scales
 and nine real mutation/deletion/price gates enforce temporal isolation. Source
 hashes and warehouse totals gate ignored manifest publication. See [quantile
 contracts and limitations](quantiles.md).
+
+Season 17's `conformal` package separates historical model fitting, held-out
+forecast ledgers, maturity-aware score selection and interval evaluation.
+September validation and an October refit precede all calibration targets;
+the same frozen predictors remain in use through evaluation. Core order
+statistics/support handling feed split, rolling, weighted and trajectory
+thresholds. A date-driven ACI queue consumes only available outcomes before
+issuing new intervals. Raw quantiles, score IDs, selected windows and alpha
+updates remain auditable. Independent predictor and calibrator perturbations,
+source hashes and warehouse totals gate ignored manifest publication. See
+[conformal design and empirical limits](conformal.md).
