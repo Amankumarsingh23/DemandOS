@@ -1,6 +1,6 @@
 """Event-accurate daily engine, FIFO backlog, supplier queue and conservation gates."""
 from collections import deque
-from dataclasses import dataclass, asdict
+from dataclasses import dataclass, asdict, replace
 from datetime import timedelta
 
 import numpy as np
@@ -69,7 +69,7 @@ class Supplier:
 
 
 def steps(demand, origin, costs, supplier, *, on_hand=10, initial_orders=(), mode="lost_sales",
-             initial_backlog=0, warmup=0, calendar_offset=0):
+             initial_backlog=0, warmup=0, calendar_offset=0, delivery_schedule=None):
     """All evaluator demand stays here; policy sees only immutable observations.
 
     Receive -> FIFO old backlog -> serve NEW demand -> unmet lost/backlogged ->
@@ -104,6 +104,17 @@ def steps(demand, origin, costs, supplier, *, on_hand=10, initial_orders=(), mod
         date = (origin+pd.Timedelta(days=calendar_offset+day)).date()
         opening, old_backlog = on_hand, backlog
         opening_on_order = sum(x.quantity for x in queue.values())
+        # Optional exogenous receiving closure, revealed at today's opening.
+        # Whole outstanding orders retain every unit and their identity; no
+        # cancellation, partial delivery or procurement refund is implicit.
+        if delivery_schedule is not None:
+            delay = integer(delivery_schedule(calendar_offset+day, date))
+            if delay:
+                for order in list(queue.values()):
+                    if order.arrival_day == day:
+                        updated = replace(order, arrival_day=day+delay, lead_time=order.lead_time+delay)
+                        queue[order.order_id] = updated
+                        events.append(dict(event="retimed", event_day=day, previous_arrival_day=order.arrival_day, **asdict(updated)))
         arrivals = sorted((x for x in queue.values() if x.arrival_day == day), key=lambda x: x.order_id)
         if any(x.arrival_day < day for x in queue.values()): raise AssertionError("Overdue order disappeared from arrivals")
         received = sum(x.quantity for x in arrivals)
@@ -177,10 +188,11 @@ def steps(demand, origin, costs, supplier, *, on_hand=10, initial_orders=(), mod
 
 
 def simulate(demand, origin, policy, costs, supplier, *, on_hand=10, initial_orders=(), mode="lost_sales",
-             initial_backlog=0, warmup=0, calendar_offset=0):
+             initial_backlog=0, warmup=0, calendar_offset=0, delivery_schedule=None):
     """Preserved full-path API; drive the same validated timeline one day at a time."""
     timeline = steps(demand, origin, costs, supplier, on_hand=on_hand, initial_orders=initial_orders,
-                     mode=mode, initial_backlog=initial_backlog, warmup=warmup, calendar_offset=calendar_offset)
+                     mode=mode, initial_backlog=initial_backlog, warmup=warmup, calendar_offset=calendar_offset,
+                     delivery_schedule=delivery_schedule)
     try:
         observation = next(timeline)
         while True:

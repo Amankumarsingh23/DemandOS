@@ -1069,6 +1069,61 @@ All **313 Python tests**, **36 fresh dbt tests**, **225 frozen-origin checks**,
 Source/model fingerprints and the **58,327,370-row warehouse** are unchanged.
 Final execution: **127.90 s**, **972.13 MiB** peak process memory.
 
+## Season 21: robust optimization and decision risk
+
+```powershell
+.\.venv\Scripts\python -m demandos.risk --root . --config configs/risk.toml
+```
+
+Finite-scenario MILPs add risk-neutral mean cost, minimax, minimax regret,
+`E[cost] + lambda*CVaR`, hard CVaR ceilings and two-family probability ambiguity
+over shock mass [.05,.20]. Exact VaR uses the left inverse CDF; CVaR integrates
+fractional tail probability, including ties and unequal weights. Independent
+integer enumeration checks minimax **Q=13 / worst cost 8**; the ten-loss goldens
+give **VaR/CVaR 30/100 at .90** and **24/65 at .80**.
+
+The original shared feasible set, persistent budgets/supplier commitments,
+pack/MOQ, store quotas and propose/allocate/commit timeline remain. The optional
+receiving-closure hook explicitly re-times whole outstanding orders, preserving
+their identities, quantities and financial commitments. Earlier defaults and
+CLI behavior are unchanged. A bounded presolve recovery retries the identical
+model without presolve; every attempt and independent feasibility check is kept.
+
+Planning uses eight joint scenarios from eligible historical blocks plus declared
+shocks; mean–CVaR weights are .5/2, confidence levels .75/.90, and static hard
+ceilings are 0/10,000/100,000/1,000,000 assumed cost units. The predeclared subset
+tests surge, shared bursts, longer leads, delivery closures, joint disruption,
+shifted probabilities, cost/scarcity and fairness/pack sensitivities. Baseline and
+joint stress also use eight distinct complete bootstrap worlds per origin.
+
+Forecast mismatch, fairness preference costs and procurement-inclusive simulated
+operating costs are reported separately. Operating tail scores use whole pool
+worlds, with continuity/stress/store breakdowns and matched cost/fill differences;
+days and series are not counted as independent worlds. The frontier contains
+only nondominated tested allocations. Finite-support DRO and small empirical
+tail samples do not establish real-world coverage or group service guarantees.
+All economics and disruptions are **SIMULATED / SCENARIO-ASSUMED**; M5 sales
+remain a censored demand proxy, with no actual Walmart savings claim.
+
+Ignored outputs: `data/risk/m5_h28/`. See [equations, scenario and queue contracts,
+solver controls, artifact descriptions and measured results](docs/robust_optimization.md).
+
+The bounded run produced **504 pool runs / 12,600 series runs / 352,800 daily
+rows**. Of **2,016 committed decision solves**, 2,015 were optimal and one
+soft-disparity regret solve returned a verified feasible incumbent with a
+**0.0558% gap**. All **3,216 scenario oracles** were optimal. Eighteen tight
+epsilon diagnostics were infeasible; all six 1,000,000-unit ceilings were feasible.
+Two presolve errors recovered on the identical model without relaxing limits.
+At the three origins, mean + 2 CVaR reduced average planning CVaR from
+**155529.33 to 152934.67**, while mean forecast cost rose **73732.33 to 74673.67**.
+This did not reduce operating CVaR in the eight-world baseline experiment;
+the two cost definitions remain distinct.
+All **340 Python tests**, **36 fresh dbt tests**, **26 independent saved-output
+gates**, **225 future-data mutations** and **54 temporal/hidden-demand checks**
+pass. **2,749 conserved order re-timings**, prior source/model fingerprints and
+the unchanged **58,327,370 warehouse observations** are verified. The run took
+**381.69 s / 1,226.40 MiB** peak memory, with no skipped experiment cells.
+
 See [architecture](docs/architecture.md) and the
 [foundation decision](docs/decisions/0001-project-foundation.md) for scope and
 design rationale.

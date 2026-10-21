@@ -373,3 +373,12 @@ candidate sorting, verified integer orders, LP-only dual diagnostics and
 independent persisted resource/engine checks gate publication. Source/model
 fingerprints and warehouse totals remain protected. See [shared optimization
 models and limitations](optimization.md).
+
+Season 21's `risk` package reuses the same sparse feasible set for mean, minimax,
+scenario-oracle regret, mean-CVaR, hard risk ceilings and finite probability
+ambiguity. An optional allocation callback preserves coordinated ordering;
+an optional receiving-closure hook re-times original queue entries with conserved
+identities/units. Prefix-only scenario generation, distinct complete evaluation
+worlds, independent cost/tail scoring and persisted resource/state audits gate
+publication. Operating risk stays separate from forecast mismatch; see
+[risk contracts and empirical limits](robust_optimization.md).

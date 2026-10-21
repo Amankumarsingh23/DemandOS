@@ -34,7 +34,8 @@ def origin_snapshot(metadata,targets,scenarios,settings,costs):
 
 
 def coordinated(actual, origin, metadata, targets, scenarios, settings, *, method, costs, lead,
-                budget_factor=.7,supplier_factor=1.,flow_factor=.8,pack=1,moq=0,fairness=Fairness(),mode="lost_sales"):
+                budget_factor=.7,supplier_factor=1.,flow_factor=.8,pack=1,moq=0,fairness=Fairness(),mode="lost_sales",
+                allocator=None,delivery_schedule=None):
     """Candidate forecasts/resources are frozen; only POST-demand observable IP evolves.
 
     All 25 timelines stop at their observation yield BEFORE allocating. One
@@ -58,7 +59,8 @@ def coordinated(actual, origin, metadata, targets, scenarios, settings, *, metho
         initial_lead,shock,_=supplier.at(0,origin)
         init=(Order("initial_0",0,initial_lead,settings["on_order"],initial_lead,shock),) if settings["on_order"] else ()
         operating=Costs(settings["holding"],settings["lost_penalty"],settings["backlog_daily"],settings["order_fee"],settings["purchase"])
-        timeline=steps(actual[i],origin,operating,supplier,on_hand=settings["on_hand"],initial_orders=init,mode=mode)
+        timeline=steps(actual[i],origin,operating,supplier,on_hand=settings["on_hand"],initial_orders=init,mode=mode,
+                       delivery_schedule=delivery_schedule)
         timelines.append(timeline);observations.append(next(timeline))
     for day in range(1,29):
         review=(day-1)%settings["review_days"]==0
@@ -78,6 +80,12 @@ def coordinated(actual, origin, metadata, targets, scenarios, settings, *, metho
                 result["status"]="UNCONSTRAINED_REFERENCE_NOT_RESOURCE_FEASIBLE"
             elif method in ["proportional","greedy"]:
                 q=baseline(c,resources,method);result["status"]="FEASIBLE_BASELINE"
+            elif allocator is not None:
+                result=allocator(c,resources,fairness,stock,scenarios,costs,day)
+                if result.get("quantity") is None:
+                    raise ValueError("Risk allocator has no feasible plan; hard limits are never relaxed: "+result["status"])
+                q=result["quantity"]
+                matrix_manifest.append(dict(day_index=day,method=method,**result.get("matrix",{})))
             else:
                 kwargs=dict(demand=scenarios,probabilities=prob,stock=stock,cu=costs.cu,co=costs.co) if method=="stochastic_milp" else {}
                 result=solve(c,resources,fairness,time_limit=settings["solver_seconds"],**kwargs)

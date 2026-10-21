@@ -1,5 +1,9 @@
 # Season 20: shared supply allocation optimization
 
+Season 21 adds [finite-scenario minimax, regret, CVaR and probability-ambiguity
+objectives](robust_optimization.md) using this same sparse feasible set and an
+optional coordinator allocator callback. Existing Season 20 defaults remain.
+
 All economics, supplier limits, budgets, volumes and outcomes are
 **SIMULATED / SCENARIO-ASSUMED**. Recorded M5 sales serve only as a declared
 demand proxy. They do not reveal uncensored demand, acquisition costs,

@@ -1,5 +1,9 @@
 # Season 19: sequential inventory simulation
 
+Season 21 adds an optional exogenous receiving-closure hook to this same queue:
+due whole orders are explicitly re-timed with identities and units intact.
+Default behavior is unchanged. See [risk and disruption contracts](robust_optimization.md).
+
 Season 20 extends the same timeline through an additive `steps(...)` interface
 for [coordinated propose/allocate/commit optimization](optimization.md). The
 `simulate(...)` API and the Season 19 results below remain preserved.

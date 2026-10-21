@@ -1,0 +1,25 @@
+# Every cost, resource limit, disruption and risk probability is SCENARIO-ASSUMED.
+[risk]
+seed = 42
+planning_scenarios = 8
+replications = 8
+solver_seconds = 3.0
+alpha = 0.75
+confidence_levels = [0.75, 0.90]
+penalties = [0.5, 2.0]
+shock_probability = 0.10
+probability_interval = [0.05, 0.20]
+# Hard CVaR limits in assumed mismatch-cost units; static origin diagnostics.
+risk_limits = [0.0, 10000.0, 100000.0, 1000000.0]
+families = ["baseline", "surge", "burst", "long_lead", "supplier_closure", "joint", "shifted_probability"]
+replicated_families = ["baseline", "joint"]
+methods = ["mean", "cvar_0.5", "cvar_2", "minimax", "regret", "dro"]
+
+# Balanced subset: main balanced/.70; separate shortage/.35 and overage/1.40
+# observed-path baseline cells; no full Cartesian sweep or tuning to 2016 outcomes.
+[resources]
+budget_factor = 0.70
+supplier_factor = 0.75
+flow_factor = 0.80
+closure_start = 8
+closure_end = 14

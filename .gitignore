@@ -79,6 +79,8 @@ Thumbs.db
 /data/.simulation-*/
 /data/optimization/
 /data/.optimization-*/
+/data/risk/
+/data/.risk-*/
 /catboost_info/
 /dbt/target/
 /dbt/logs/
