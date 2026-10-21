@@ -81,6 +81,8 @@ Thumbs.db
 /data/.optimization-*/
 /data/risk/
 /data/.risk-*/
+/data/causal/
+/data/.causal-*/
 /catboost_info/
 /dbt/target/
 /dbt/logs/

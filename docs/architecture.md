@@ -382,3 +382,11 @@ identities/units. Prefix-only scenario generation, distinct complete evaluation
 worlds, independent cost/tail scoring and persisted resource/state audits gate
 publication. Operating risk stays separate from forecast mismatch; see
 [risk contracts and empirical limits](robust_optimization.md).
+
+Season 22's `causal` package separates one-allocation contextual OPE from full
+controller interventions. Known synthetic propensities and chronological
+selected-reward-only fits feed IPS/SNIPS/DM/DR; all-action outcomes remain in a
+separate post-fit oracle audit. Whole-pool/world blocks preserve shared-resource
+dependence and resets reuse the original engine. Independent metric/state/source
+gates guard publication. No actual Walmart causal effect is inferred; see
+[causal evaluation](causal_evaluation.md) and the [future trial plan](causal_experiment_design.md).

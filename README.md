@@ -1124,6 +1124,47 @@ pass. **2,749 conserved order re-timings**, prior source/model fingerprints and
 the unchanged **58,327,370 warehouse observations** are verified. The run took
 **381.69 s / 1,226.40 MiB** peak memory, with no skipped experiment cells.
 
+## Season 22: causal and off-policy evaluation
+
+```powershell
+.\.venv\Scripts\python -m demandos.causal --root . --config configs/causal.toml
+```
+
+Two separate tracks evaluate **SIMULATED / SYNTHETIC LOGGING / MODEL-WORLD**
+decisions. Track A issues one feasible whole-pool allocation at the origin,
+measures 14-day reward, and compares IPS/SNIPS/DM/DR with a separate finite-world
+oracle. Known stochastic logging exposes only selected rewards to chronological
+Ridge/forest/intercept fits; estimated propensities and biased clipping remain
+separate experiments. Track B resets and runs two complete 28-day controllers
+under matched demand/supply worlds. One-step DR is not controller-level OPE.
+
+The bounded run covers **25 real M5 series**, three retrospective origins,
+**36 contexts / 288 context-world units**, **9,216 selected log rows** across
+32 assignment replications, **576 one-shot oracle interventions**, and **108
+complete controller runs**. Repeated assignments reuse eight worlds; they are
+not independent demand observations. All-action outcomes stay in `oracle/`.
+
+In eight-world baseline comparisons, CVaR versus mean increased simulated
+operating cost by **3,008.89**, improved mean paired fill by **0.318 percentage
+points**, and reduced lost sales by **34.83 units/pool episode**. Average
+origin-specific operating CVaR rose **775,773.83 to 779,586.60**. Joint disruption
+also increased cost (**3,850.87**), despite slightly better fill. These are
+assumed-cost simulator contrasts, not measured Walmart savings or effects.
+Eight synthetic world-panel bootstrap blocks and one real historical pool do
+not establish reliable real-world confidence coverage.
+
+All **364 Python tests**, **36 fresh dbt tests**, **38 independent output gates**,
+**234 source mutations**, **108 catalogue/propensity perturbations** and **30
+reset/temporal checks** pass. Source/model fingerprints and the **58,327,370-row
+warehouse** are unchanged. Execution: **765.23 s / 788.66 MiB** peak process
+memory. Five time-limited solves returned independently verified feasible
+incumbents; the largest relative gap was **0.00483%**.
+
+Ignored artifacts: `data/causal/m5_h28/`, including `causal_report.md` and
+`verification.json`. See [estimands, equations, measured results and limitations](docs/causal_evaluation.md)
+and the [future cluster-randomized trial design](docs/causal_experiment_design.md).
+No real trial or deployment occurred.
+
 See [architecture](docs/architecture.md) and the
 [foundation decision](docs/decisions/0001-project-foundation.md) for scope and
 design rationale.

@@ -1,0 +1,19 @@
+# SIMULATED / SYNTHETIC LOGGING / MODEL-WORLD. No Walmart assignment logs exist.
+[causal]
+seed = 42
+worlds = 8
+logging_replications = 32
+one_step_days = 14
+initial_stock = [0, 10, 30]
+budget_factors = [0.10, 0.70]
+flow_factors = [0.50, 0.80]
+actions = ["mean", "cvar_2"]
+targets = ["mean", "cvar", "mixture", "risk_rule"]
+outcome_models = ["ridge", "forest", "misspecified"]
+propensity_sources = ["known", "estimated"]
+bootstrap_samples = 200
+controlled_replications = 200
+controlled_n = 2000
+sequential_trajectories = 2048
+solver_seconds = 3.0
+sales_as_demand = true
