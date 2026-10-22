@@ -1,0 +1,24 @@
+# PRODUCTION-ORIENTED LOCAL HISTORICAL DEMONSTRATION. No live order dispatch.
+[serving]
+seed = 42
+origins = ["2016-01-31", "2016-02-28", "2016-03-27"]
+horizon = 28
+series = 25
+label_lag_days = 2
+canary_fraction = 0.5
+solver_seconds = 3.0
+determinism_atol = 0.0000000001
+simulation_worlds = 4
+
+[alerts]
+version = "historical-demo-v1"
+minimum_samples = 20
+psi_warning = 0.25
+ks_warning = 0.30
+missingness_warning = 0.10
+mae_relative_warning = 0.20
+coverage_drop_warning = 0.10
+fallback_rate_warning = 0.10
+simulated_cost_increase_warning = 0.10
+simulated_fill_drop_warning = 0.05
+window = "one origin; reference frozen at 2016-01-31"

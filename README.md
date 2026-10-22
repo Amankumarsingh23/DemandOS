@@ -1165,6 +1165,57 @@ Ignored artifacts: `data/causal/m5_h28/`, including `causal_report.md` and
 and the [future cluster-randomized trial design](docs/causal_experiment_design.md).
 No real trial or deployment occurred.
 
+## Season 23: local production-oriented batch serving
+
+```powershell
+.\.venv\Scripts\python -m demandos.serving --root . --config configs/serving.toml
+```
+
+`demandos.serving` adds immutable model manifests and approval/alias history,
+versioned shared feature transforms, point-in-time availability gates, verified
+native inference, atomic local batch publication, drift/mature-label monitors,
+whole-pool simulated canaries, controlled rollback and explicit fallback modes.
+No checkpoint is retrained. The comparison uses the actual Season 16 frozen
+LightGBM ensemble and older Season 17 **pre-calibration** ensemble; the fallback
+is the existing 56-day empirical-quantile recipe, explicitly without fitted weights.
+
+The bounded historical run covers **25 M5 series / three origins / 28 horizons**:
+**2,100 forecasts per native model**, plus **700 fallback forecasts** at the
+first origin. Seven immutable batches have **4,900 unique forecast rows / 100
+simulated origin authorizations**. Shadow publishes zero active actions; **75
+separate simulated canary actions** reference existing forecast batches.
+Identical retries reuse completed batches; conflicting/corrupted content blocks.
+
+| Frozen model, three matched origins | MAE | WAPE | P10-P90 coverage |
+|---|---:|---:|---:|
+| Season 16 / approved reference | 9.393891 | 60.4349% | 79.7143% |
+| Season 17 / older candidate | 8.414804 | 54.1360% | 77.6190% |
+
+Date-based sales availability and a two-day label lag are explicit replay
+assumptions. At origin+10, only horizons 1-8 mature (**200/700 rows**). PSI/KS
+use frozen January 31 reference bins and descriptive thresholds; synthetic
+mean/zero/spike/missingness injections warn, while critical schema/history,
+artifact, prediction and resource faults block publication.
+
+Thirty full controller runs produced **21,000 daily rows**. On the three
+observed-sales proxy paths, the older candidate improved aggregate simulated
+fill **47.07% to 54.45%**, while mean cost rose **592,656.67 to 639,401.40**.
+Four bootstrap worlds/origin provide a small descriptive risk diagnostic.
+These are **SIMULATED state/cost/canary outcomes**, with no live dispatch,
+Walmart production connection or measured business policy effect.
+
+All **392 Python tests**, **36 fresh dbt tests**, **30 independent output gates**,
+**six saved-feature parity checks**, **18 future-data checks** and **24 controller
+temporal/reset checks** pass. All **28 injected fault cases** meet their declared
+block/warn/recovery disposition. Source/model fingerprints and **58,327,370
+warehouse rows** remain unchanged. Execution: **112.35 s / 624.38 MiB** peak
+process memory; all **120 controller solves** optimal, maximum MIP gap zero.
+
+Ignored `data/serving/m5_h28/latest_verified.json` points to the verified
+versioned run, including registry, immutable batches, canary references,
+incidents/faults, monitored metrics, source hashes and `serving_report.md`.
+See [contracts, architecture, measured results and limitations](docs/production_serving.md).
+
 See [architecture](docs/architecture.md) and the
 [foundation decision](docs/decisions/0001-project-foundation.md) for scope and
 design rationale.

@@ -390,3 +390,12 @@ separate post-fit oracle audit. Whole-pool/world blocks preserve shared-resource
 dependence and resets reuse the original engine. Independent metric/state/source
 gates guard publication. No actual Walmart causal effect is inferred; see
 [causal evaluation](causal_evaluation.md) and the [future trial plan](causal_experiment_design.md).
+
+Season 23's `serving` package wraps existing native quantile checkpoints with
+versioned feature/PIT contracts, immutable registry entries, atomic local batch
+publication and complete decision lineage. Separate drift/mature-label monitors,
+shadow comparisons, whole-pool simulated canary references, controlled alias
+rollback and failure-specific fallback gates exercise a local historical replay.
+Independent persisted-output/source audits guard the verified-run pointer.
+There is no live order dispatcher or production connection; see
+[serving contracts and measured replay](production_serving.md).

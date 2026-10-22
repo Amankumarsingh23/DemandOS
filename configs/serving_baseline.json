@@ -1,0 +1,9 @@
+{
+  "algorithm": "historical_empirical",
+  "version": "existing-season16-56d-v1",
+  "days": 56,
+  "levels": [0.1, 0.5, 0.9],
+  "method": "inverted_cdf_including_zeros",
+  "trained_weights": false,
+  "purpose": "Explicit eligible-history fallback recipe; not a historically fitted checkpoint"
+}
