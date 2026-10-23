@@ -1,0 +1,519 @@
+{
+  "claim_labels": {
+    "causal": "MODEL_WORLD_CAUSAL_DEMO",
+    "faults": "LOCAL_SERVING_FAULT_EXERCISE",
+    "forecasts": "HISTORICAL_FORECAST_EVALUATION",
+    "inventory": "SIMULATED_INVENTORY_OUTCOME",
+    "logging": "SYNTHETIC_POLICY_LOG",
+    "optimization": "SIMULATED_OPTIMIZATION_OUTCOME",
+    "source": "REAL_OBSERVED_SOURCE"
+  },
+  "comparison_rule": "Match population, origin, horizon, outcome, grain, economics, availability and support. Isolated method attribution additionally requires same fitted checkpoint.",
+  "records": [
+    {
+      "assumptions": "Source fingerprints and warehouse total are independently checked by the current demo; prices may be missing; recorded sales may be censored.",
+      "cohort": "full M5 validation history",
+      "comparison_key": "3ffee18122ccadb417dd6b69a1ede3eca0de402b04457b842bf577eb949bbce6",
+      "evaluation_grain": "store-item-date; full source fact",
+      "experiment_id": "m5-validation-foundation",
+      "horizon": null,
+      "metric_units": "units/day for MAE; fraction for WAPE/coverage/fill; assumed currency for costs/rewards",
+      "metrics": {
+        "daily_rows": 58327370,
+        "date_max": "2016-04-24",
+        "date_min": "2011-01-29",
+        "missing_price_count": 12299413,
+        "products": 3049,
+        "series": 30490,
+        "stores": 10,
+        "zero_sales_count": 39777094
+      },
+      "model_checkpoint_id": null,
+      "model_fit_cutoff": null,
+      "module": "data/warehouse",
+      "origins": [],
+      "outcome_label": "REAL_OBSERVED_SOURCE",
+      "season": 2,
+      "series_count": 30490,
+      "source_data_fingerprint": "02844756610e074f866ce2ea4fc137916b61c5aa2881de6da0e385e40d1e871b",
+      "sources": {
+        "data/warehouse/analytics_quality_report.json": "72bf1dd4d9c95ad090651e035131461478c762027a51a36b820a7ff88c5c7c18"
+      },
+      "validation_cutoff": null,
+      "verification_status": "RECOMPUTED_FROM_SAVED_RECORDS; no claim of full experiment rerun"
+    },
+    {
+      "assumptions": "Recorded sales target; repaired quantiles; different fit/validation windows. Descriptive comparison, no isolated method effect.",
+      "cohort": [
+        "continuity",
+        "sparse_stress"
+      ],
+      "comparison_key": "native-serving-same-2100-cases",
+      "evaluation_grain": "store-item-origin-horizon",
+      "experiment_id": "s16-lgb-20160131",
+      "horizon": 28,
+      "metric_units": "units/day for MAE; fraction for WAPE/coverage/fill; assumed currency for costs/rewards",
+      "metrics": {
+        "coverage": 0.7971428571428572,
+        "mae": 9.393890979304286,
+        "n": 2100,
+        "pinball": 2.858507202176255,
+        "wape": 0.6043493369443969,
+        "width": 20.003543969655155
+      },
+      "model_checkpoint_id": "s16-lgb-20160131",
+      "model_fit_cutoff": "2016-01-31",
+      "module": "serving",
+      "origins": [
+        "2016-01-31",
+        "2016-02-28",
+        "2016-03-27"
+      ],
+      "outcome_label": "HISTORICAL_FORECAST_EVALUATION",
+      "season": 23,
+      "series_count": 25,
+      "source_data_fingerprint": "02844756610e074f866ce2ea4fc137916b61c5aa2881de6da0e385e40d1e871b",
+      "sources": {
+        "data/serving/m5_h28/runs/4a1ac097e68396db82c0/tables/maturity_ledger.parquet": "6d042d91b5000213867cab4298c18a72249aea750bae0c62283ce3ecf602082b"
+      },
+      "validation_cutoff": "2016-01-03",
+      "verification_status": "RECOMPUTED_FROM_SAVED_RECORDS; no claim of full experiment rerun"
+    },
+    {
+      "assumptions": "Recorded sales target; repaired quantiles; different fit/validation windows. Descriptive comparison, no isolated method effect.",
+      "cohort": [
+        "continuity",
+        "sparse_stress"
+      ],
+      "comparison_key": "native-serving-same-2100-cases",
+      "evaluation_grain": "store-item-origin-horizon",
+      "experiment_id": "s17-precalibration-lgb-20151011",
+      "horizon": 28,
+      "metric_units": "units/day for MAE; fraction for WAPE/coverage/fill; assumed currency for costs/rewards",
+      "metrics": {
+        "coverage": 0.7761904761904762,
+        "mae": 8.414804373360614,
+        "n": 2100,
+        "pinball": 2.685633323182053,
+        "wape": 0.5413604921284629,
+        "width": 19.837356317276743
+      },
+      "model_checkpoint_id": "s17-precalibration-lgb-20151011",
+      "model_fit_cutoff": "2015-10-11",
+      "module": "serving",
+      "origins": [
+        "2016-01-31",
+        "2016-02-28",
+        "2016-03-27"
+      ],
+      "outcome_label": "HISTORICAL_FORECAST_EVALUATION",
+      "season": 23,
+      "series_count": 25,
+      "source_data_fingerprint": "02844756610e074f866ce2ea4fc137916b61c5aa2881de6da0e385e40d1e871b",
+      "sources": {
+        "data/serving/m5_h28/runs/4a1ac097e68396db82c0/tables/maturity_ledger.parquet": "6d042d91b5000213867cab4298c18a72249aea750bae0c62283ce3ecf602082b"
+      },
+      "validation_cutoff": "2015-10-11",
+      "verification_status": "RECOMPUTED_FROM_SAVED_RECORDS; no claim of full experiment rerun"
+    },
+    {
+      "assumptions": "Rechecked every batch seal and content hash; no live order dispatch or production SLO claim.",
+      "cohort": [
+        "continuity",
+        "sparse_stress"
+      ],
+      "comparison_key": "5f85437517b713d61219e15f43021cd5ee8bed202ed912bb854aa908f8fae457",
+      "evaluation_grain": "local immutable historical forecast batch",
+      "experiment_id": "immutable-local-batches",
+      "horizon": 28,
+      "metric_units": "units/day for MAE; fraction for WAPE/coverage/fill; assumed currency for costs/rewards",
+      "metrics": {
+        "forecast_rows": 4900,
+        "immutable_batches": 7
+      },
+      "model_checkpoint_id": null,
+      "model_fit_cutoff": null,
+      "module": "serving",
+      "origins": [
+        "2016-01-31",
+        "2016-02-28",
+        "2016-03-27"
+      ],
+      "outcome_label": "LOCAL_SERVING_FAULT_EXERCISE",
+      "season": 23,
+      "series_count": 25,
+      "source_data_fingerprint": "02844756610e074f866ce2ea4fc137916b61c5aa2881de6da0e385e40d1e871b",
+      "sources": {
+        "data/serving/m5_h28/runs/4a1ac097e68396db82c0/publication/batches/00759db99cdf113c6ff13fbc558efa0956df4463d61978e38d771696f34161e4/completed.json": "6e9a0c4a278042e3193fb433720543443dd65bda7d34f38b64ddd5d7f1b0a87a",
+        "data/serving/m5_h28/runs/4a1ac097e68396db82c0/publication/batches/1a7efb2188977a6823b8726e3ede587115cf3a020b44e1a95aa51202c2fa596f/completed.json": "3e85e865160e98561d9e2e22ba5d7bf049df5e8200516d20cb7888eb8986a219",
+        "data/serving/m5_h28/runs/4a1ac097e68396db82c0/publication/batches/6fc521f754a7398e142e90062b1255c4a5a95ae92b18fcf79baa540d8ead0c08/completed.json": "5ae33688e72f8b1375101842664599aab8ae647a7f5ae676a097a653cd49a341",
+        "data/serving/m5_h28/runs/4a1ac097e68396db82c0/publication/batches/891635f4e16c400edc705322013b7a20e2acbbd5b95cb7f14aaf124741b2c485/completed.json": "1a99860e616e6fdc6f5ac11cd605d65739f519a0f9080a61ce706172c17de314",
+        "data/serving/m5_h28/runs/4a1ac097e68396db82c0/publication/batches/b79000f3c565d1c2c9ddd84a5f7ad6b17e10dce1751ce35ccd245156f4311cc1/completed.json": "d2424cd89db9bea4007a07e8cc49ef3db2b1523b28c634b488547f7ebd00bcde",
+        "data/serving/m5_h28/runs/4a1ac097e68396db82c0/publication/batches/cf1ef744c18027a54a0e65f6d2140a325b520e1a20346474ede059f188739a64/completed.json": "0f9105dbca211a16af8a8b3bc50aabed3e7866e74777dc16942eabd40ca46723",
+        "data/serving/m5_h28/runs/4a1ac097e68396db82c0/publication/batches/d2cc0cfa61124c121ce43501e26cb27ab698166f61cfcd8d57691bc4a0589c23/completed.json": "9135379c9b0faa4450659e0c163ef158c37a4e48ac69dbdfce8753de777364e0"
+      },
+      "validation_cutoff": null,
+      "verification_status": "RECOMPUTED_FROM_SAVED_RECORDS; no claim of full experiment rerun"
+    },
+    {
+      "assumptions": "80% marginal interval target; temporal dependence, no unconditional finite-sample time-series guarantee.",
+      "cohort": [
+        "sparse_stress"
+      ],
+      "comparison_key": "s17-same-neural-checkpoint-stress",
+      "evaluation_grain": "store-item-origin-horizon",
+      "experiment_id": "neural_base_repaired",
+      "horizon": 28,
+      "metric_units": "units/day for MAE; fraction for WAPE/coverage/fill; assumed currency for costs/rewards",
+      "metrics": {
+        "coverage": 0.36408730158730157,
+        "n": 1008,
+        "width": 2.3942537427614217
+      },
+      "model_checkpoint_id": "s17_neural_frozen_2015-10-11",
+      "model_fit_cutoff": "2015-10-11",
+      "module": "conformal",
+      "origins": [
+        "2016-01-31",
+        "2016-02-28",
+        "2016-03-27"
+      ],
+      "outcome_label": "HISTORICAL_FORECAST_EVALUATION",
+      "season": 17,
+      "series_count": 12,
+      "source_data_fingerprint": "02844756610e074f866ce2ea4fc137916b61c5aa2881de6da0e385e40d1e871b",
+      "sources": {
+        "data/conformal/m5_h28/tables/intervals.parquet": "4f986b31e990d7beb240d9e8661e391f04f6f433342d50d2d2c2916ea1c1a639"
+      },
+      "validation_cutoff": "2015-10-11",
+      "verification_status": "RECOMPUTED_FROM_SAVED_RECORDS; no claim of full experiment rerun"
+    },
+    {
+      "assumptions": "80% marginal interval target; temporal dependence, no unconditional finite-sample time-series guarantee.",
+      "cohort": [
+        "sparse_stress"
+      ],
+      "comparison_key": "s17-same-neural-checkpoint-stress",
+      "evaluation_grain": "store-item-origin-horizon",
+      "experiment_id": "neural_split_cqr",
+      "horizon": 28,
+      "metric_units": "units/day for MAE; fraction for WAPE/coverage/fill; assumed currency for costs/rewards",
+      "metrics": {
+        "coverage": 0.7976190476190477,
+        "n": 1008,
+        "width": 2.415411726550543
+      },
+      "model_checkpoint_id": "s17_neural_frozen_2015-10-11",
+      "model_fit_cutoff": "2015-10-11",
+      "module": "conformal",
+      "origins": [
+        "2016-01-31",
+        "2016-02-28",
+        "2016-03-27"
+      ],
+      "outcome_label": "HISTORICAL_FORECAST_EVALUATION",
+      "season": 17,
+      "series_count": 12,
+      "source_data_fingerprint": "02844756610e074f866ce2ea4fc137916b61c5aa2881de6da0e385e40d1e871b",
+      "sources": {
+        "data/conformal/m5_h28/tables/intervals.parquet": "4f986b31e990d7beb240d9e8661e391f04f6f433342d50d2d2c2916ea1c1a639"
+      },
+      "validation_cutoff": "2015-10-11",
+      "verification_status": "RECOMPUTED_FROM_SAVED_RECORDS; no claim of full experiment rerun"
+    },
+    {
+      "assumptions": "80% marginal interval target; temporal dependence, no unconditional finite-sample time-series guarantee.",
+      "cohort": [
+        "sparse_stress"
+      ],
+      "comparison_key": "s17-same-neural-checkpoint-stress",
+      "evaluation_grain": "store-item-origin-horizon",
+      "experiment_id": "neural_rolling_cqr",
+      "horizon": 28,
+      "metric_units": "units/day for MAE; fraction for WAPE/coverage/fill; assumed currency for costs/rewards",
+      "metrics": {
+        "coverage": 0.8402777777777778,
+        "n": 1008,
+        "width": 2.4690487196682596
+      },
+      "model_checkpoint_id": "s17_neural_frozen_2015-10-11",
+      "model_fit_cutoff": "2015-10-11",
+      "module": "conformal",
+      "origins": [
+        "2016-01-31",
+        "2016-02-28",
+        "2016-03-27"
+      ],
+      "outcome_label": "HISTORICAL_FORECAST_EVALUATION",
+      "season": 17,
+      "series_count": 12,
+      "source_data_fingerprint": "02844756610e074f866ce2ea4fc137916b61c5aa2881de6da0e385e40d1e871b",
+      "sources": {
+        "data/conformal/m5_h28/tables/intervals.parquet": "4f986b31e990d7beb240d9e8661e391f04f6f433342d50d2d2c2916ea1c1a639"
+      },
+      "validation_cutoff": "2015-10-11",
+      "verification_status": "RECOMPUTED_FROM_SAVED_RECORDS; no claim of full experiment rerun"
+    },
+    {
+      "assumptions": "Assumed balanced economics, fixed seven-day lead, same shared pool and hard constraints; fill/cost trade-off.",
+      "cohort": [
+        "continuity"
+      ],
+      "comparison_key": "s20-main-balanced-b0.7-continuity",
+      "evaluation_grain": "mean 28-day series-run cost; demand-weighted immediate fill",
+      "experiment_id": "stochastic_milp",
+      "horizon": 28,
+      "metric_units": "units/day for MAE; fraction for WAPE/coverage/fill; assumed currency for costs/rewards",
+      "metrics": {
+        "cost_mean": 55317.502564102564,
+        "fill": 0.6711094186341711,
+        "series_runs": 39
+      },
+      "model_checkpoint_id": null,
+      "model_fit_cutoff": null,
+      "module": "optimization",
+      "origins": [
+        "2016-01-31",
+        "2016-02-28",
+        "2016-03-27"
+      ],
+      "outcome_label": "SIMULATED_OPTIMIZATION_OUTCOME",
+      "season": 20,
+      "series_count": 13,
+      "source_data_fingerprint": "02844756610e074f866ce2ea4fc137916b61c5aa2881de6da0e385e40d1e871b",
+      "sources": {
+        "data/optimization/m5_h28/tables/runs.parquet": "d25d9b94aa55fd07adf57277e181d2e858d6fc4e03f65bb0dd9552c078837ab4"
+      },
+      "validation_cutoff": null,
+      "verification_status": "RECOMPUTED_FROM_SAVED_RECORDS; no claim of full experiment rerun"
+    },
+    {
+      "assumptions": "Assumed balanced economics, fixed seven-day lead, same shared pool and hard constraints; fill/cost trade-off.",
+      "cohort": [
+        "continuity"
+      ],
+      "comparison_key": "s20-main-balanced-b0.7-continuity",
+      "evaluation_grain": "mean 28-day series-run cost; demand-weighted immediate fill",
+      "experiment_id": "proportional",
+      "horizon": 28,
+      "metric_units": "units/day for MAE; fraction for WAPE/coverage/fill; assumed currency for costs/rewards",
+      "metrics": {
+        "cost_mean": 57291.22564102564,
+        "fill": 0.6986227468900736,
+        "series_runs": 39
+      },
+      "model_checkpoint_id": null,
+      "model_fit_cutoff": null,
+      "module": "optimization",
+      "origins": [
+        "2016-01-31",
+        "2016-02-28",
+        "2016-03-27"
+      ],
+      "outcome_label": "SIMULATED_OPTIMIZATION_OUTCOME",
+      "season": 20,
+      "series_count": 13,
+      "source_data_fingerprint": "02844756610e074f866ce2ea4fc137916b61c5aa2881de6da0e385e40d1e871b",
+      "sources": {
+        "data/optimization/m5_h28/tables/runs.parquet": "d25d9b94aa55fd07adf57277e181d2e858d6fc4e03f65bb0dd9552c078837ab4"
+      },
+      "validation_cutoff": null,
+      "verification_status": "RECOMPUTED_FROM_SAVED_RECORDS; no claim of full experiment rerun"
+    },
+    {
+      "assumptions": "Discrete scenario loss, alpha .75; planning mismatch differs from operating procurement/holding/lost cost.",
+      "cohort": "selected 25-series pool",
+      "comparison_key": "s21-static-baseline-planning",
+      "evaluation_grain": "origin-mean pool day-zero planning mismatch cost",
+      "experiment_id": "mean",
+      "horizon": 28,
+      "metric_units": "units/day for MAE; fraction for WAPE/coverage/fill; assumed currency for costs/rewards",
+      "metrics": {
+        "cvar": 155529.33333333334,
+        "expected": 73732.33333333333
+      },
+      "model_checkpoint_id": null,
+      "model_fit_cutoff": null,
+      "module": "risk",
+      "origins": [
+        "2016-01-31",
+        "2016-02-28",
+        "2016-03-27"
+      ],
+      "outcome_label": "SIMULATED_OPTIMIZATION_OUTCOME",
+      "season": 21,
+      "series_count": 25,
+      "source_data_fingerprint": "02844756610e074f866ce2ea4fc137916b61c5aa2881de6da0e385e40d1e871b",
+      "sources": {
+        "data/risk/m5_h28/tables/risk_frontier.parquet": "416386d692cb352fae288dd50135fed0ae45248cb536c90b5f4ff1e97b34742a",
+        "data/risk/m5_h28/tables/scenario_manifest.parquet": "0d4cab8bd361e510b3461d08a820685ff3aaf6baff40dcae15f1c770c3405895"
+      },
+      "validation_cutoff": null,
+      "verification_status": "RECOMPUTED_FROM_SAVED_RECORDS; no claim of full experiment rerun"
+    },
+    {
+      "assumptions": "Discrete scenario loss, alpha .75; planning mismatch differs from operating procurement/holding/lost cost.",
+      "cohort": "selected 25-series pool",
+      "comparison_key": "s21-static-baseline-planning",
+      "evaluation_grain": "origin-mean pool day-zero planning mismatch cost",
+      "experiment_id": "cvar_2",
+      "horizon": 28,
+      "metric_units": "units/day for MAE; fraction for WAPE/coverage/fill; assumed currency for costs/rewards",
+      "metrics": {
+        "cvar": 152934.66666666666,
+        "expected": 74673.66666666667
+      },
+      "model_checkpoint_id": null,
+      "model_fit_cutoff": null,
+      "module": "risk",
+      "origins": [
+        "2016-01-31",
+        "2016-02-28",
+        "2016-03-27"
+      ],
+      "outcome_label": "SIMULATED_OPTIMIZATION_OUTCOME",
+      "season": 21,
+      "series_count": 25,
+      "source_data_fingerprint": "02844756610e074f866ce2ea4fc137916b61c5aa2881de6da0e385e40d1e871b",
+      "sources": {
+        "data/risk/m5_h28/tables/risk_frontier.parquet": "416386d692cb352fae288dd50135fed0ae45248cb536c90b5f4ff1e97b34742a",
+        "data/risk/m5_h28/tables/scenario_manifest.parquet": "0d4cab8bd361e510b3461d08a820685ff3aaf6baff40dcae15f1c770c3405895"
+      },
+      "validation_cutoff": null,
+      "verification_status": "RECOMPUTED_FROM_SAVED_RECORDS; no claim of full experiment rerun"
+    },
+    {
+      "assumptions": "No direct comparison of magnitude to first-review planning loss; no guaranteed tail-risk reduction.",
+      "cohort": [
+        "ALL"
+      ],
+      "comparison_key": "s21-baseline-eight-operating-worlds",
+      "evaluation_grain": "origin-mean whole-pool simulated operating cost; eight worlds/origin",
+      "experiment_id": "mean-operating",
+      "horizon": 28,
+      "metric_units": "units/day for MAE; fraction for WAPE/coverage/fill; assumed currency for costs/rewards",
+      "metrics": {
+        "cvar": 772612.7666666666,
+        "expected": 726107.525
+      },
+      "model_checkpoint_id": null,
+      "model_fit_cutoff": null,
+      "module": "risk",
+      "origins": [
+        "2016-01-31",
+        "2016-02-28",
+        "2016-03-27"
+      ],
+      "outcome_label": "SIMULATED_INVENTORY_OUTCOME",
+      "season": 21,
+      "series_count": 25,
+      "source_data_fingerprint": "02844756610e074f866ce2ea4fc137916b61c5aa2881de6da0e385e40d1e871b",
+      "sources": {
+        "data/risk/m5_h28/tables/pool_operating.parquet": "1c64ecad7ecd2d2dca8d4c45929fee4a0491db07afc887d1bfa494bd99fd88db"
+      },
+      "validation_cutoff": null,
+      "verification_status": "RECOMPUTED_FROM_SAVED_RECORDS; no claim of full experiment rerun"
+    },
+    {
+      "assumptions": "No direct comparison of magnitude to first-review planning loss; no guaranteed tail-risk reduction.",
+      "cohort": [
+        "ALL"
+      ],
+      "comparison_key": "s21-baseline-eight-operating-worlds",
+      "evaluation_grain": "origin-mean whole-pool simulated operating cost; eight worlds/origin",
+      "experiment_id": "cvar_2-operating",
+      "horizon": 28,
+      "metric_units": "units/day for MAE; fraction for WAPE/coverage/fill; assumed currency for costs/rewards",
+      "metrics": {
+        "cvar": 774309.3666666667,
+        "expected": 729076.2916666666
+      },
+      "model_checkpoint_id": null,
+      "model_fit_cutoff": null,
+      "module": "risk",
+      "origins": [
+        "2016-01-31",
+        "2016-02-28",
+        "2016-03-27"
+      ],
+      "outcome_label": "SIMULATED_INVENTORY_OUTCOME",
+      "season": 21,
+      "series_count": 25,
+      "source_data_fingerprint": "02844756610e074f866ce2ea4fc137916b61c5aa2881de6da0e385e40d1e871b",
+      "sources": {
+        "data/risk/m5_h28/tables/pool_operating.parquet": "1c64ecad7ecd2d2dca8d4c45929fee4a0491db07afc887d1bfa494bd99fd88db"
+      },
+      "validation_cutoff": null,
+      "verification_status": "RECOMPUTED_FROM_SAVED_RECORDS; no claim of full experiment rerun"
+    },
+    {
+      "assumptions": "One shared resource pool; 24 conditional simulated world/origin pairs, no measured Walmart treatment effect.",
+      "cohort": [
+        "ALL"
+      ],
+      "comparison_key": "s22-paired-baseline",
+      "evaluation_grain": "mean paired whole-pool CVaR-minus-mean intervention difference",
+      "experiment_id": "paired-baseline",
+      "horizon": 28,
+      "metric_units": "units/day for MAE; fraction for WAPE/coverage/fill; assumed currency for costs/rewards",
+      "metrics": {
+        "cost_difference": 3008.8916666666532,
+        "fill_difference": 0.003175833565362015,
+        "world_origin_pairs": 24
+      },
+      "model_checkpoint_id": null,
+      "model_fit_cutoff": null,
+      "module": "causal",
+      "origins": [
+        "2016-01-31",
+        "2016-02-28",
+        "2016-03-27"
+      ],
+      "outcome_label": "MODEL_WORLD_CAUSAL_DEMO",
+      "season": 22,
+      "series_count": 25,
+      "source_data_fingerprint": "02844756610e074f866ce2ea4fc137916b61c5aa2881de6da0e385e40d1e871b",
+      "sources": {
+        "data/causal/m5_h28/tables/trajectory_runs.parquet": "a27c31dac1d97896011e9748586c968e215f99d782aafe887db88aaeca4718ed"
+      },
+      "validation_cutoff": null,
+      "verification_status": "RECOMPUTED_FROM_SAVED_RECORDS; no claim of full experiment rerun"
+    },
+    {
+      "assumptions": "Synthetic randomized logging with known positivity; nuisance predictions cross-fitted chronologically; no actual M5 propensities.",
+      "cohort": "selected 25-series pool",
+      "comparison_key": "s22-known-propensity-single-rep",
+      "evaluation_grain": "held-out context/world one-action negative simulated cost reward",
+      "experiment_id": "known-propensity-ridge-rep0-mean-policy",
+      "horizon": 14,
+      "metric_units": "units/day for MAE; fraction for WAPE/coverage/fill; assumed currency for costs/rewards",
+      "metrics": {
+        "dm": -301915.85478269187,
+        "dr": -317327.76814377116,
+        "ips": -328355.35377203446,
+        "n": 192,
+        "snips": -314571.50818762457
+      },
+      "model_checkpoint_id": null,
+      "model_fit_cutoff": null,
+      "module": "causal",
+      "origins": [
+        "2016-02-28",
+        "2016-03-27"
+      ],
+      "outcome_label": "SYNTHETIC_POLICY_LOG",
+      "season": 22,
+      "series_count": 25,
+      "source_data_fingerprint": "02844756610e074f866ce2ea4fc137916b61c5aa2881de6da0e385e40d1e871b",
+      "sources": {
+        "data/causal/m5_h28/tables/nuisance_predictions.parquet": "eb1dc8ce916fb7b99d029557bd8473f821c4bf4f54f30c38dce9c611be06e823",
+        "data/causal/m5_h28/tables/ope_estimates.parquet": "94cc8c47c2240c19c75faded7e2c3b810bdb14f225cfc172283d32dbe81b098c",
+        "data/causal/m5_h28/tables/synthetic_logs.parquet": "ec7a2c1ff01c91acf3904b7e1dd23d5aa69abba54e2c33828986102beaa98343"
+      },
+      "validation_cutoff": null,
+      "verification_status": "RECOMPUTED_FROM_SAVED_RECORDS; no claim of full experiment rerun"
+    }
+  ],
+  "schema_version": 1,
+  "source_fingerprint": "02844756610e074f866ce2ea4fc137916b61c5aa2881de6da0e385e40d1e871b"
+}

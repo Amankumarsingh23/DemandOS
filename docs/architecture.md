@@ -1,29 +1,66 @@
 # DemandOS architecture
 
-## Implemented scope: Seasons 1–11
+## Implemented scope: Seasons 1–24
 
-The installable Python package includes validated M5 ingestion and a local
-DuckDB/dbt analytics warehouse. Season 2 streams CSV sales into long-form
-Parquet; Season 3 queries that output through views and builds reusable
-dimensions and aggregate marts. Season 4 reduces those relations into descriptive
-statistics, temporal summaries, product ABC/weekly XYZ labels, store-item sales
-occurrence regimes, actual-data figures, and a reproducible business report.
-Season 5 adds small-cohort mathematical diagnostics and forecast-origin temporal
-contracts, with training-only segmentation and preprocessing demonstrations.
-Season 6 adds twelve observed-sales point-forecast baselines and a bounded,
-fixed-origin holdout experiment. Season 7 adds rolling-origin execution,
-expanding/sliding windows, explicit coverage, paired comparisons and train-only
-M5-style RMSSE scales. Season 8 adds origin-level sales reductions, direct-horizon
-calendar expansion, training-only category state and physically separate labels.
-Season 9 fits three pooled, horizon-aware gradient-boosted models with bounded
-historical examples, chronological early stopping, origin-specific label
-eligibility and native serialization. Season 10 compares pooled, recursive,
-direct horizon-specific and independently wrapped vector-output LightGBM, with
-an earlier-validation-selected ensemble and audited computational costs.
-Season 11 adds observed-sales intermittency diagnostics, global hurdle means,
-explicit cold-history simulations and supported priors, plus frozen regime
-routes/blends. Inventory optimization, serving,
-dashboards, and monitoring are future work.
+The repository implements historical sales ingestion and analytics, chronological
+forecasting research, uncertainty/reconciliation, simulated inventory/risk/causal
+experiments, native-model local batch serving and an independently audited final
+capstone. Inventory optimization, registry, monitoring and rollback demonstrations
+are implemented. External supplier dispatch, cloud services, live inventory events
+and production transactions are not implemented.
+
+```mermaid
+flowchart TD
+    subgraph Forecast-serving path
+        A[Original M5 sales / calendar / prices] --> B[Chunked validated Parquet]
+        B --> C[DuckDB / dbt dimensions and marts]
+        C --> D[PIT features: event and availability cutoffs]
+        D --> E[Digest-bound native model registry]
+        E --> F[28-day P10 / P50 / P90 forecasts]
+        F --> G[Staged audited immutable publication]
+        G --> H[Mature-label scoring / PSI / KS / rollback / fallback]
+    end
+    subgraph Simulated decision and replay path
+        F --> I[Newsvendor / protection-period targets]
+        I --> J[Shared MILP: cash / supplier / flow / receiving]
+        J --> K[Stateful receive / serve / approve / order engine]
+        K --> L[Independent stock / queue / cost / resource audit]
+        L --> M[CVaR / minimax / regret / ambiguity and disruptions]
+    end
+    subgraph Offline research and evaluation
+        C --> N[Statistical / global boosting / intermittent / hurdle]
+        D --> O[LSTM / GRU / N-BEATS / compact TFT]
+        N --> P[Chronological rolling-origin comparison]
+        O --> P
+        P --> Q[Grouped hierarchy / quantiles / conformal calibration]
+        K --> R[Synthetic policy logs / IPS / SNIPS / DM / DR]
+        R --> S[Paired whole-pool MODEL_WORLD interventions]
+    end
+    G --> T[Season 24 frozen identity / evidence and claim registry]
+    L --> T
+    P --> T
+    S --> T
+```
+
+These paths share contracts and artifacts; they are not one mandatory chain
+through every model family. Forecast-serving uses real recorded-sales inputs.
+Inventory costs, capacities, stock, supplier events and policy assignments are
+assumed or simulated. They cannot establish actual retailer savings or effects.
+
+The capstone selects six earlier-cohort keys at 2016-01-31, loads three existing
+native S16 quantiles, issues 168 forecasts, and independently audits three complete
+simulated trajectories plus isolated faults. It snapshots source/model/code/config
+lineage, validates persisted files, publishes atomically under a local writer lock,
+and rejects conflicting reuse. Full raw data and prior artifacts remain unchanged.
+
+See the [quickstart](capstone_quickstart.md), [scientific comparability](capstone_results.md),
+[portfolio](portfolio_case_study.md), [interview defense](interview_defense.md) and
+[proposed deployment design](system_design_defense.md).
+
+## Historical architecture details
+
+Earlier season detail below is retained as implementation context. The current
+scope above includes all later forecasting, inventory, risk and serving modules.
 
 ## Problem and observational unit
 

@@ -85,6 +85,7 @@ Thumbs.db
 /data/.causal-*/
 /data/serving/
 /data/.serving-*/
+/data/capstone/
 /catboost_info/
 /dbt/target/
 /dbt/logs/

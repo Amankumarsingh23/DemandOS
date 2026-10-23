@@ -1,40 +1,119 @@
 # DemandOS
 
-DemandOS is a learning-driven retail demand intelligence project. Its goal is to
-turn credible sales forecasts and uncertainty estimates into cost-aware inventory
-decisions.
+DemandOS connects historical retail sales forecasting with explicitly simulated
+inventory decisions. It includes validated M5 ingestion, a DuckDB/dbt warehouse,
+chronological forecasting experiments, uncertainty calibration, shared-resource
+optimization, synthetic causal evaluation and local native-model batch serving.
 
-## Current milestone: Season 14 — Temporal Fusion Transformer
+## Current milestone: Season 24 — integrated capstone
 
-This repository contains validated M5 ingestion and a local DuckDB/dbt retail
-analytics warehouse, with reproducible retail EDA, figures, and ABC/XYZ and
-store-item intermittency classifications, plus time-series diagnostics and
-origin-aware temporal utilities. Twelve point-forecast baselines now run on a
-small training-selected cohort with explicit coverage, rolling-origin MAE/WAPE
-and train-only RMSSE evaluation, plus expanding/sliding window comparisons.
-Direct-horizon features now combine origin-safe sales history, target calendars,
-verified-as-of historical-price interfaces and training-only categorical mappings.
-LightGBM, XGBoost and CatBoost now fit pooled, horizon-aware observed-sales models
-with chronological validation and origin-specific refits. A separate experiment
-now compares pooled, recursive, direct horizon-specific and independent vector
-forecasting, plus an earlier-validation-selected ensemble.
-Origin-safe intermittency diagnostics, a global hurdle mean model, cold-history
-simulations, supported category priors and frozen segment policies are now
-implemented separately. Global PyTorch LSTM and GRU encoders now add masked
-56-day sequences and direct 28-day observed-sales forecasts with chronological
-validation and train-only preprocessing. Target-only generic and interpretable
-N-BEATS now add backcast residuals, additive forecasts and attributed polynomial/
-weekly-Fourier components. A compact global point TFT now adds static/past/future
-variable selection, gated residual networks, recurrent local processing and
-masked shared-value temporal attention. Inventory optimization,
-APIs, and dashboards remain future work. Generated
-datasets, forecasts, and reports stay
-outside Git; verified results are documented below.
+Seasons 1–24 are implemented as local research and engineering workflows. The
+capstone adds a fixed six-series, 28-day native replay, independent conservation
+and provenance checks, immutable publication, cross-season scientific evidence
+and interview materials. It does not deploy a live retailer system or send orders.
 
-The verified source dataset is M5: daily product/store sales, calendar
-information, and selling prices. Sales are observations, not necessarily true
-demand: stockouts can hide purchases customers wanted to make. Any future demand
-estimation or inventory simulation must state its assumptions explicitly.
+The source is **30,490 store-item series × 1,913 days = 58,327,370 observations**,
+ending **2016-04-24**. Recorded sales may be censored by unavailable stock; actual
+inventory, supplier economics, real policy propensities and production telemetry
+are absent. Forecast backtests use recorded sales. Inventory/risk/causal outcomes
+are explicitly assumed or simulated.
+
+```mermaid
+flowchart LR
+    A[Original M5 CSVs] --> B[Validated Parquet]
+    B --> C[DuckDB and dbt warehouse]
+    C --> D[Origin-safe features]
+    D --> E[Approved native model registry]
+    E --> F[28-day batch forecasts]
+    F --> G[Immutable publication and mature-label monitoring]
+    F -. simulated decisions .-> H[Shared budget/supplier/flow MILP]
+    H --> I[Stateful inventory replay and independent audit]
+    C -. offline studies .-> J[Statistical / boosting / neural models]
+    J --> K[Hierarchy / quantiles / calibration]
+    I -. declared model world .-> L[Risk scenarios and synthetic causal/OPE]
+```
+
+Model families are alternatives, not mandatory steps in one prediction request.
+The [current architecture](docs/architecture.md) distinguishes the runtime paths.
+
+## Reproduce the bounded demo
+
+Use Python 3.11+ and obtain legitimate M5 data separately. A fresh clone has no
+ignored datasets or fitted weights. The [quickstart](docs/capstone_quickstart.md)
+lists exact raw filenames, installation, source/warehouse commands, saved native
+model prerequisites, evidence tables and version constraints.
+
+```powershell
+.\.venv\Scripts\python -m demandos.capstone --root . --check-prereqs
+.\.venv\Scripts\python -m demandos.capstone --root . --dry-run
+.\.venv\Scripts\python -m demandos.capstone --root .
+.\.venv\Scripts\python -m demandos.capstone --root . --verify
+.\.venv\Scripts\python -m unittest discover -s tests -v
+```
+
+The demo loads existing S16 native P10/P50/P90 LightGBM models fit through
+2016-01-31, issues 168 forecasts, validates six noncommitted origin allocations,
+and audits three complete simulated paths. Repeat the execution command to
+verify equivalent immutable reuse without duplicate forecasts or order actions.
+Runtime artifacts stay under ignored `data/capstone/m5_h28/`; the verified-run
+pointer identifies the exact immutable bundle. Nothing is trained or downloaded.
+
+## Selected scientific results
+
+These are **recomputed from saved records**, separate from the current capstone
+replay. Full definitions, artifact hashes and comparability rules are in the
+[evidence registry](docs/evidence_registry.json) and [scientific audit](docs/capstone_results.md).
+
+| Population/method | Result | Boundary and source |
+| --- | --- | --- |
+| 25 series, 3 origins, 28 days: S16 native checkpoint | MAE 9.393891; WAPE 60.4349%; P10–P90 coverage 79.7143% | [Serving](docs/production_serving.md); fit 2016-01-31, validation ends 2016-01-03 |
+| Same 2,100 cases: older S17 checkpoint | MAE 8.414804; WAPE 54.1360%; coverage 77.6190% | Different fit through 2015-10-11; no isolated method attribution |
+| S17 same neural checkpoint, stress cohort, 1,008 targets | Raw/split-CQR/rolling-CQR coverage 36.4087% / 79.7619% / 84.0278% | [Calibration](docs/conformal.md); descriptive temporal coverage |
+| S20 continuity, 39 series-runs, balanced budget .7 | Mean simulated cost MILP 55,317.50 vs proportional 57,291.23; fill 67.1109% vs 69.8623% | [Optimization](docs/optimization.md); lower cost accompanies lower immediate service |
+| S21 static planning loss versus operating cost | Risk method lowers planning CVaR but raises audited operating CVaR | [Risk evidence](docs/capstone_results.md); distinct outcomes, no universal winner |
+| S22 baseline, 24 paired model-world pool trajectories | CVaR-minus-mean cost +3,008.89; fill +0.3176 percentage points | [Causal study](docs/causal_evaluation.md); synthetic/model-world result |
+
+## Scientific claims and limitations
+
+| Output label | Meaning |
+| --- | --- |
+| REAL_OBSERVED_SOURCE | Recorded M5 sales/calendar/prices; not verified latent demand |
+| HISTORICAL_FORECAST_EVALUATION | Retrospective eligible-model sales error and interval coverage |
+| SIMULATED_INVENTORY_OUTCOME | Assumed stock, orders, shortage and operating costs |
+| SIMULATED_OPTIMIZATION_OUTCOME | Decisions under assumed economics and resource limits |
+| SYNTHETIC_POLICY_LOG | Generated assignments with declared propensities |
+| MODEL_WORLD_CAUSAL_DEMO | Conditional effects inside a declared simulator |
+| LOCAL_SERVING_FAULT_EXERCISE | Local isolated blocks/retries; no live service reliability claim |
+
+No actual Walmart savings, verified real-world causal uplift, official full M5
+competition ranking or deployed supplier system is claimed. Physical storage
+uses a conservative assumed entitlement ceiling; procurement flow is a separate
+constraint. Partial supply and external order transactions are absent.
+
+## Modules and documentation
+
+| Seasons | Implemented modules and guides |
+| --- | --- |
+| 1–4 | [Data ingestion](src/demandos/data/), [warehouse](docs/warehouse.md), [EDA](docs/eda.md) |
+| 5–8 | [Temporal contracts](docs/timeseries.md), [baselines](docs/forecasting.md), [backtesting](docs/backtesting.md), [features](docs/features.md) |
+| 9–11 | [Boosting](docs/boosting.md), [multi-horizon strategies](docs/multihorizon.md), [intermittent sales](docs/intermittent.md) |
+| 12–14 | [LSTM/GRU](docs/neural.md), [N-BEATS](docs/nbeats.md), [compact TFT](docs/tft.md) |
+| 15–17 | [Reconciliation](docs/reconciliation.md), [quantiles](docs/quantiles.md), [conformal](docs/conformal.md) |
+| 18–21 | [Inventory decisions](docs/inventory_decisions.md), [stateful simulation](docs/inventory_simulation.md), [MILP](docs/optimization.md), [risk](docs/robust_optimization.md) |
+| 22–24 | [Synthetic causal evaluation](docs/causal_evaluation.md), [registry/serving](docs/production_serving.md), [capstone code](src/demandos/capstone/), [quickstart](docs/capstone_quickstart.md) |
+
+Read the [portfolio case study](docs/portfolio_case_study.md),
+[interview defense](docs/interview_defense.md), [system design defense](docs/system_design_defense.md)
+and [comparability matrix](docs/capstone_results.md#direct-comparison-rules).
+The [capstone acceptance record](docs/capstone_verification.md) reports the actual
+six-series replay, 414 Python tests, 36 fresh dbt tests, source integrity,
+independent gates, fault dispositions and measured runtime/memory.
+
+## Historical season implementation details
+
+The sections below preserve the earlier learning milestones, commands and
+experiment-specific measurements. They describe their original bounded scopes;
+the current index and final scientific audit above govern project-wide claims.
 
 ## Local setup
 
